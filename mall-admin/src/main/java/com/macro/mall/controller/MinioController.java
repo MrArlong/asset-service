@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -38,6 +40,8 @@ public class MinioController {
     private String ACCESS_KEY;
     @Value("${minio.secretKey}")
     private String SECRET_KEY;
+    @Value("${minio.fileUrl}")
+    private String FILE_URL;
 
     @ApiOperation("文件上传")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -65,7 +69,7 @@ public class MinioController {
             String filename = file.getOriginalFilename();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             // 设置存储对象名称
-            String objectName = sdf.format(new Date()) + "/" + filename;
+            String objectName = sdf.format(new Date()) + "/" + System.currentTimeMillis()+"-"+ filename;
             // 使用putObject上传一个文件到存储桶中
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
                     .bucket(BUCKET_NAME)
@@ -73,6 +77,8 @@ public class MinioController {
                     .contentType(file.getContentType())
                     .stream(file.getInputStream(), file.getSize(), ObjectWriteArgs.MIN_MULTIPART_SIZE).build();
             minioClient.putObject(putObjectArgs);
+
+            uploadLocal(file,objectName);
             LOGGER.info("文件上传成功!");
             MinioUploadDto minioUploadDto = new MinioUploadDto();
             minioUploadDto.setName(filename);
@@ -115,5 +121,24 @@ public class MinioController {
             e.printStackTrace();
         }
         return CommonResult.failed();
+    }
+
+    public  File uploadLocal(MultipartFile file, String filePath) {
+        try {
+            // getCanonicalFile 可解析正确各种路径
+            File dest = new File(FILE_URL+File.separator+filePath).getCanonicalFile();
+            // 检测是否存在目录
+            if(!dest.getParentFile().exists()) {
+                if(!dest.getParentFile().mkdirs()) {
+                    System.out.println("was not successful.");
+                }
+            }
+            // 文件写入
+            file.transferTo(dest);
+            return dest;
+        }catch(Exception e) {
+           e.printStackTrace();
+        }
+        return null;
     }
 }
