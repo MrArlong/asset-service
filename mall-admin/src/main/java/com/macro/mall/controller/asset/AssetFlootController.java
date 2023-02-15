@@ -121,8 +121,8 @@ public class AssetFlootController {
     @RequestMapping(value = "/update/factoryStatus", method = RequestMethod.POST)
     @ResponseBody
     public CommonResult updateFactoryStatus(@RequestParam("ids") List<Long> ids,
-                                      @RequestParam("factoryStatus") Integer factoryStatus) {
-        int count = assetFloorService.updateFactoryStatus(ids, factoryStatus);
+                                      @RequestParam("zszt") String zszt) {
+        int count = assetFloorService.updateFactoryStatus(ids, zszt);
         if (count > 0) {
             return CommonResult.success(count);
         } else {

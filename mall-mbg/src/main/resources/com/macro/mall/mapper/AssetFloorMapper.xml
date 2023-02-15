@@ -11,9 +11,10 @@
     <result column="syzt" jdbcType="VARCHAR" property="syzt" />
     <result column="zszt" jdbcType="VARCHAR" property="zszt" />
     <result column="lbtp" jdbcType="VARCHAR" property="lbtp" />
-    <result column="isFinish" jdbcType="VARCHAR" property="isfinish" />
+    <result column="isfinish" jdbcType="VARCHAR" property="isfinish" />
     <result column="sort" jdbcType="INTEGER" property="sort" />
-    <result column="longitudeAndLatitude" jdbcType="VARCHAR" property="longitudeandlatitude" />
+    <result column="longitude" jdbcType="VARCHAR" property="longitude" />
+    <result column="Latitude" jdbcType="VARCHAR" property="latitude" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -74,7 +75,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, address, region, lxr, lxdh, syzt, zszt, lbtp, isFinish, sort, longitudeAndLatitude
+    id, name, address, region, lxr, lxdh, syzt, zszt, lbtp, isfinish, sort, longitude, 
+    Latitude
   </sql>
   <select id="selectByExample" parameterType="com.macro.mall.model.AssetFloorExample" resultMap="BaseResultMap">
     select
@@ -112,12 +114,12 @@
     </selectKey>
     insert into asset_floor (name, address, region, 
       lxr, lxdh, syzt, zszt, 
-      lbtp, isFinish, sort, 
-      longitudeAndLatitude)
+      lbtp, isfinish, sort, 
+      longitude, Latitude)
     values (#{name,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, 
       #{lxr,jdbcType=VARCHAR}, #{lxdh,jdbcType=VARCHAR}, #{syzt,jdbcType=VARCHAR}, #{zszt,jdbcType=VARCHAR}, 
       #{lbtp,jdbcType=VARCHAR}, #{isfinish,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
-      #{longitudeandlatitude,jdbcType=VARCHAR})
+      #{longitude,jdbcType=VARCHAR}, #{latitude,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.macro.mall.model.AssetFloor">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -150,13 +152,16 @@
         lbtp,
       </if>
       <if test="isfinish != null">
-        isFinish,
+        isfinish,
       </if>
       <if test="sort != null">
         sort,
       </if>
-      <if test="longitudeandlatitude != null">
-        longitudeAndLatitude,
+      <if test="longitude != null">
+        longitude,
+      </if>
+      <if test="latitude != null">
+        Latitude,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -190,8 +195,11 @@
       <if test="sort != null">
         #{sort,jdbcType=INTEGER},
       </if>
-      <if test="longitudeandlatitude != null">
-        #{longitudeandlatitude,jdbcType=VARCHAR},
+      <if test="longitude != null">
+        #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -232,13 +240,16 @@
         lbtp = #{row.lbtp,jdbcType=VARCHAR},
       </if>
       <if test="row.isfinish != null">
-        isFinish = #{row.isfinish,jdbcType=VARCHAR},
+        isfinish = #{row.isfinish,jdbcType=VARCHAR},
       </if>
       <if test="row.sort != null">
         sort = #{row.sort,jdbcType=INTEGER},
       </if>
-      <if test="row.longitudeandlatitude != null">
-        longitudeAndLatitude = #{row.longitudeandlatitude,jdbcType=VARCHAR},
+      <if test="row.longitude != null">
+        longitude = #{row.longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="row.latitude != null">
+        Latitude = #{row.latitude,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="example != null">
@@ -256,9 +267,10 @@
       syzt = #{row.syzt,jdbcType=VARCHAR},
       zszt = #{row.zszt,jdbcType=VARCHAR},
       lbtp = #{row.lbtp,jdbcType=VARCHAR},
-      isFinish = #{row.isfinish,jdbcType=VARCHAR},
+      isfinish = #{row.isfinish,jdbcType=VARCHAR},
       sort = #{row.sort,jdbcType=INTEGER},
-      longitudeAndLatitude = #{row.longitudeandlatitude,jdbcType=VARCHAR}
+      longitude = #{row.longitude,jdbcType=VARCHAR},
+      Latitude = #{row.latitude,jdbcType=VARCHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -291,13 +303,16 @@
         lbtp = #{lbtp,jdbcType=VARCHAR},
       </if>
       <if test="isfinish != null">
-        isFinish = #{isfinish,jdbcType=VARCHAR},
+        isfinish = #{isfinish,jdbcType=VARCHAR},
       </if>
       <if test="sort != null">
         sort = #{sort,jdbcType=INTEGER},
       </if>
-      <if test="longitudeandlatitude != null">
-        longitudeAndLatitude = #{longitudeandlatitude,jdbcType=VARCHAR},
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        Latitude = #{latitude,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -312,9 +327,10 @@
       syzt = #{syzt,jdbcType=VARCHAR},
       zszt = #{zszt,jdbcType=VARCHAR},
       lbtp = #{lbtp,jdbcType=VARCHAR},
-      isFinish = #{isfinish,jdbcType=VARCHAR},
+      isfinish = #{isfinish,jdbcType=VARCHAR},
       sort = #{sort,jdbcType=INTEGER},
-      longitudeAndLatitude = #{longitudeandlatitude,jdbcType=VARCHAR}
+      longitude = #{longitude,jdbcType=VARCHAR},
+      Latitude = #{latitude,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

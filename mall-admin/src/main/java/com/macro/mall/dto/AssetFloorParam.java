@@ -41,14 +41,17 @@ public class AssetFloorParam {
     private String lbtp;
 
     @ApiModelProperty(value = "是否完工")
-    private String isFinish;
+    private String isfinish;
 
     @Min(value = 0)
     @ApiModelProperty(value = "排序字段")
     private Integer sort;
 
     @ApiModelProperty(value = "地图经纬度")
-    private String longitudeAndLatitude;
+    private String longitude;
+
+    @ApiModelProperty(value = "地图经纬度")
+    private String Latitude;
 
 
 }

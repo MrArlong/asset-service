@@ -53,7 +53,7 @@ public interface AssetFloorService {
     int updateShowStatus(List<Long> ids, Integer showStatus);
 
     /**
-     * 修改厂家制造商状态
+     * 修改展示状态
      */
-    int updateFactoryStatus(List<Long> ids, Integer factoryStatus);
+    int updateFactoryStatus(List<Long> ids, String zszt);
 }

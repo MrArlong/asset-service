@@ -42,11 +42,11 @@ public class AssetFloorServiceImpl implements AssetFloorService {
         BeanUtils.copyProperties(assetFloorParam, assetFloor);
         assetFloor.setId(id);
         //更新品牌时要更新商品中的品牌名称
-        PmsProduct product = new PmsProduct();
+        /*PmsProduct product = new PmsProduct();
         product.setBrandName(assetFloor.getName());
         PmsProductExample example = new PmsProductExample();
         example.createCriteria().andBrandIdEqualTo(id);
-        productMapper.updateByExampleSelective(product,example);
+        productMapper.updateByExampleSelective(product,example);*/
         return assetFloorMapper.updateByPrimaryKeySelective(assetFloor);
     }
 
@@ -88,8 +88,9 @@ public class AssetFloorServiceImpl implements AssetFloorService {
     }
 
     @Override
-    public int updateFactoryStatus(List<Long> ids, Integer factoryStatus) {
+    public int updateFactoryStatus(List<Long> ids, String zszt) {
         AssetFloor assetFloor = new AssetFloor();
+        assetFloor.setZszt(zszt);
         AssetFloorExample assetFloorExample = new AssetFloorExample();
         assetFloorExample.createCriteria().andIdIn(ids);
         return assetFloorMapper.updateByExampleSelective(assetFloor, assetFloorExample);

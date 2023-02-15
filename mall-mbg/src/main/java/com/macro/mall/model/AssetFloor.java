@@ -36,8 +36,11 @@ public class AssetFloor implements Serializable {
     @ApiModelProperty(value = "排序")
     private Integer sort;
 
-    @ApiModelProperty(value = "经纬度")
-    private String longitudeandlatitude;
+    @ApiModelProperty(value = "经度")
+    private String longitude;
+
+    @ApiModelProperty(value = "纬度")
+    private String latitude;
 
     private static final long serialVersionUID = 1L;
 
@@ -129,12 +132,20 @@ public class AssetFloor implements Serializable {
         this.sort = sort;
     }
 
-    public String getLongitudeandlatitude() {
-        return longitudeandlatitude;
+    public String getLongitude() {
+        return longitude;
     }
 
-    public void setLongitudeandlatitude(String longitudeandlatitude) {
-        this.longitudeandlatitude = longitudeandlatitude;
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
     }
 
     @Override
@@ -154,7 +165,8 @@ public class AssetFloor implements Serializable {
         sb.append(", lbtp=").append(lbtp);
         sb.append(", isfinish=").append(isfinish);
         sb.append(", sort=").append(sort);
-        sb.append(", longitudeandlatitude=").append(longitudeandlatitude);
+        sb.append(", longitude=").append(longitude);
+        sb.append(", latitude=").append(latitude);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

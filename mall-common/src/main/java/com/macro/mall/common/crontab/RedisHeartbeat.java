@@ -3,6 +3,7 @@ package com.macro.mall.common.crontab;
 import com.macro.mall.common.service.RedisService;
 import com.macro.mall.common.service.impl.RedisServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
  * @description lettuce redis心跳检测，解决连接超时问题
  */
 @Component
+@EnableScheduling
 public class RedisHeartbeat {
 
     @Autowired
@@ -20,7 +22,6 @@ public class RedisHeartbeat {
 
     @Scheduled(cron = "0 0/2 * * * *")
     public void timer() {
-        System.err.println("启动中");
         redisService.get("heartbeat");
     }
 
