@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.mapper.AssetRoomMapper">
+  <resultMap id="BaseResultMap" type="com.macro.mall.model.AssetRoom">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="floor_id" jdbcType="BIGINT" property="floorId" />
+    <result column="room_num" jdbcType="VARCHAR" property="roomNum" />
+    <result column="floor_num" jdbcType="VARCHAR" property="floorNum" />
+    <result column="acreage" jdbcType="VARCHAR" property="acreage" />
+    <result column="decoration_type" jdbcType="VARCHAR" property="decorationType" />
+    <result column="price" jdbcType="VARCHAR" property="price" />
+    <result column="is_occupancy" jdbcType="VARCHAR" property="isOccupancy" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="zszt" jdbcType="VARCHAR" property="zszt" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.macro.mall.model.AssetRoom">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, floor_id, room_num, floor_num, acreage, decoration_type, price, is_occupancy, 
+    sort, zszt
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.macro.mall.model.AssetRoomExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from asset_room
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.macro.mall.model.AssetRoomExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from asset_room
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from asset_room
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from asset_room
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.macro.mall.model.AssetRoomExample">
+    delete from asset_room
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.macro.mall.model.AssetRoom">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into asset_room (floor_id, room_num, floor_num, 
+      acreage, decoration_type, price, 
+      is_occupancy, sort, zszt, 
+      description)
+    values (#{floorId,jdbcType=BIGINT}, #{roomNum,jdbcType=VARCHAR}, #{floorNum,jdbcType=VARCHAR}, 
+      #{acreage,jdbcType=VARCHAR}, #{decorationType,jdbcType=VARCHAR}, #{price,jdbcType=VARCHAR}, 
+      #{isOccupancy,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, #{zszt,jdbcType=VARCHAR}, 
+      #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.macro.mall.model.AssetRoom">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into asset_room
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="floorId != null">
+        floor_id,
+      </if>
+      <if test="roomNum != null">
+        room_num,
+      </if>
+      <if test="floorNum != null">
+        floor_num,
+      </if>
+      <if test="acreage != null">
+        acreage,
+      </if>
+      <if test="decorationType != null">
+        decoration_type,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="isOccupancy != null">
+        is_occupancy,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="zszt != null">
+        zszt,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="floorId != null">
+        #{floorId,jdbcType=BIGINT},
+      </if>
+      <if test="roomNum != null">
+        #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="floorNum != null">
+        #{floorNum,jdbcType=VARCHAR},
+      </if>
+      <if test="acreage != null">
+        #{acreage,jdbcType=VARCHAR},
+      </if>
+      <if test="decorationType != null">
+        #{decorationType,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=VARCHAR},
+      </if>
+      <if test="isOccupancy != null">
+        #{isOccupancy,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="zszt != null">
+        #{zszt,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.macro.mall.model.AssetRoomExample" resultType="java.lang.Long">
+    select count(*) from asset_room
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update asset_room
+    <set>
+      <if test="row.id != null">
+        id = #{row.id,jdbcType=BIGINT},
+      </if>
+      <if test="row.floorId != null">
+        floor_id = #{row.floorId,jdbcType=BIGINT},
+      </if>
+      <if test="row.roomNum != null">
+        room_num = #{row.roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="row.floorNum != null">
+        floor_num = #{row.floorNum,jdbcType=VARCHAR},
+      </if>
+      <if test="row.acreage != null">
+        acreage = #{row.acreage,jdbcType=VARCHAR},
+      </if>
+      <if test="row.decorationType != null">
+        decoration_type = #{row.decorationType,jdbcType=VARCHAR},
+      </if>
+      <if test="row.price != null">
+        price = #{row.price,jdbcType=VARCHAR},
+      </if>
+      <if test="row.isOccupancy != null">
+        is_occupancy = #{row.isOccupancy,jdbcType=VARCHAR},
+      </if>
+      <if test="row.sort != null">
+        sort = #{row.sort,jdbcType=INTEGER},
+      </if>
+      <if test="row.zszt != null">
+        zszt = #{row.zszt,jdbcType=VARCHAR},
+      </if>
+      <if test="row.description != null">
+        description = #{row.description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update asset_room
+    set id = #{row.id,jdbcType=BIGINT},
+      floor_id = #{row.floorId,jdbcType=BIGINT},
+      room_num = #{row.roomNum,jdbcType=VARCHAR},
+      floor_num = #{row.floorNum,jdbcType=VARCHAR},
+      acreage = #{row.acreage,jdbcType=VARCHAR},
+      decoration_type = #{row.decorationType,jdbcType=VARCHAR},
+      price = #{row.price,jdbcType=VARCHAR},
+      is_occupancy = #{row.isOccupancy,jdbcType=VARCHAR},
+      sort = #{row.sort,jdbcType=INTEGER},
+      zszt = #{row.zszt,jdbcType=VARCHAR},
+      description = #{row.description,jdbcType=LONGVARCHAR}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update asset_room
+    set id = #{row.id,jdbcType=BIGINT},
+      floor_id = #{row.floorId,jdbcType=BIGINT},
+      room_num = #{row.roomNum,jdbcType=VARCHAR},
+      floor_num = #{row.floorNum,jdbcType=VARCHAR},
+      acreage = #{row.acreage,jdbcType=VARCHAR},
+      decoration_type = #{row.decorationType,jdbcType=VARCHAR},
+      price = #{row.price,jdbcType=VARCHAR},
+      is_occupancy = #{row.isOccupancy,jdbcType=VARCHAR},
+      sort = #{row.sort,jdbcType=INTEGER},
+      zszt = #{row.zszt,jdbcType=VARCHAR}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.macro.mall.model.AssetRoom">
+    update asset_room
+    <set>
+      <if test="floorId != null">
+        floor_id = #{floorId,jdbcType=BIGINT},
+      </if>
+      <if test="roomNum != null">
+        room_num = #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="floorNum != null">
+        floor_num = #{floorNum,jdbcType=VARCHAR},
+      </if>
+      <if test="acreage != null">
+        acreage = #{acreage,jdbcType=VARCHAR},
+      </if>
+      <if test="decorationType != null">
+        decoration_type = #{decorationType,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=VARCHAR},
+      </if>
+      <if test="isOccupancy != null">
+        is_occupancy = #{isOccupancy,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="zszt != null">
+        zszt = #{zszt,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.macro.mall.model.AssetRoom">
+    update asset_room
+    set floor_id = #{floorId,jdbcType=BIGINT},
+      room_num = #{roomNum,jdbcType=VARCHAR},
+      floor_num = #{floorNum,jdbcType=VARCHAR},
+      acreage = #{acreage,jdbcType=VARCHAR},
+      decoration_type = #{decorationType,jdbcType=VARCHAR},
+      price = #{price,jdbcType=VARCHAR},
+      is_occupancy = #{isOccupancy,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      zszt = #{zszt,jdbcType=VARCHAR},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.macro.mall.model.AssetRoom">
+    update asset_room
+    set floor_id = #{floorId,jdbcType=BIGINT},
+      room_num = #{roomNum,jdbcType=VARCHAR},
+      floor_num = #{floorNum,jdbcType=VARCHAR},
+      acreage = #{acreage,jdbcType=VARCHAR},
+      decoration_type = #{decorationType,jdbcType=VARCHAR},
+      price = #{price,jdbcType=VARCHAR},
+      is_occupancy = #{isOccupancy,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      zszt = #{zszt,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

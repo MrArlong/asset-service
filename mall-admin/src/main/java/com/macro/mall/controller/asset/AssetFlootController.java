@@ -26,14 +26,14 @@ public class AssetFlootController {
     @Autowired
     private AssetFloorService assetFloorService;
 
-    @ApiOperation(value = "获取全部品牌列表")
+    @ApiOperation(value = "获取全部资产列表")
     @RequestMapping(value = "/listAll", method = RequestMethod.GET)
     @ResponseBody
     public CommonResult<List<AssetFloor>> getList() {
         return CommonResult.success(assetFloorService.listAllBrand());
     }
 
-    @ApiOperation(value = "添加品牌")
+    @ApiOperation(value = "添加资产")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public CommonResult create(@Validated @RequestBody AssetFloorParam assetFloorParam) {
