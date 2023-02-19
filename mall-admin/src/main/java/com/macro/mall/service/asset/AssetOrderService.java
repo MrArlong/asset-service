@@ -1,9 +1,9 @@
 package com.macro.mall.service.asset;
 
 import com.macro.mall.dto.*;
-import com.macro.mall.model.AssetFloor;
+import com.macro.mall.model.AssetOrder;
+import com.macro.mall.model.AssetOrderRoom;
 import com.macro.mall.model.AssetRoom;
-import com.macro.mall.model.PmsProduct;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +15,12 @@ import java.util.Set;
  * 房间管理Service
  * Created by macro on 2018/4/26.
  */
-public interface AssetRoomService {
+public interface AssetOrderService {
     /**
      * 创建商品
      */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
-    int create(AssetRoomParam assetRoomParam);
+    int create(AssetOrderParam assetOrderParam);
 
     /**
      * 根据商品编号获取更新信息
@@ -31,12 +31,12 @@ public interface AssetRoomService {
      * 更新商品
      */
     @Transactional
-    int update(Long id, AssetRoomParam assetRoomParam);
+    int update(Long id, AssetOrderParam assetRoomParam);
 
     /**
      * 分页查询商品
      */
-    List<AssetRoom> list(AssetRoomQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum);
+    List<AssetOrder> list(AssetOrderQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum);
 
     /**
      * 批量修改审核状态
@@ -70,12 +70,12 @@ public interface AssetRoomService {
     /**
      * 获取品牌详情
      */
-    AssetRoom getBrand(Long id);
+    AssetOrder getBrand(Long id);
 
     /**
      * 根据商品名称或者货号模糊查询
      */
-    List<AssetRoom> list(String keyword);
+    List<AssetOrder> list(String keyword);
 
     int updateFactoryStatus(List<Long> ids, String zszt);
 
@@ -88,6 +88,5 @@ public interface AssetRoomService {
 
     Long getOrderNum();
 
-    List<String> getLc(Long floorId);
-    List<AssetRoom> getFj(Long floorId,String floor);
+    List<AssetOrderRoomDto> getOrderRoom(Long id);
 }

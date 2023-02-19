@@ -1,15 +1,17 @@
 package com.macro.mall.service.impl.asset;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
-import com.macro.mall.dao.*;
+import com.macro.mall.dao.PmsProductDao;
+import com.macro.mall.dao.PmsProductVertifyRecordDao;
+import com.macro.mall.dao.PmsSkuStockDao;
 import com.macro.mall.dto.*;
-import com.macro.mall.mapper.*;
+import com.macro.mall.mapper.AssetOrderMapper;
+import com.macro.mall.mapper.AssetOrderRoomMapper;
+import com.macro.mall.mapper.PmsSkuStockMapper;
 import com.macro.mall.model.*;
-import com.macro.mall.service.asset.AssetRoomService;
+import com.macro.mall.service.asset.AssetOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -19,7 +21,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,10 +32,12 @@ import java.util.stream.Collectors;
  * Created by macro on 2018/4/26.
  */
 @Service
-public class AssetRoomServiceImpl implements AssetRoomService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AssetRoomServiceImpl.class);
+public class AssetOrderServiceImpl implements AssetOrderService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssetOrderServiceImpl.class);
     @Autowired
-    private AssetRoomMapper assetRoomMapper;
+    private AssetOrderMapper assetOrderMapper;
+    @Autowired
+    private AssetOrderRoomMapper assetOrderRoomMapper;
     @Autowired
     private PmsSkuStockDao skuStockDao;
     @Autowired
@@ -41,10 +48,18 @@ public class AssetRoomServiceImpl implements AssetRoomService {
     private PmsProductVertifyRecordDao productVertifyRecordDao;
 
     @Override
-    public int create(AssetRoomParam assetRoomParam) {
-        AssetRoom assetRoom = new AssetRoom();
-        BeanUtils.copyProperties(assetRoomParam, assetRoom);
-        return assetRoomMapper.insertSelective(assetRoom);
+    public int create(AssetOrderParam assetOrderParam) {
+        AssetOrder assetOrder = new AssetOrder();
+        BeanUtils.copyProperties(assetOrderParam, assetOrder);
+        List<AssetOrderRoomParam> orderRoom = assetOrderParam.getOrderRoom();
+        int i = assetOrderMapper.insertSelective(assetOrder);
+        for(AssetOrderRoomParam room: orderRoom) {
+            AssetOrderRoom assetOrderRoom = new AssetOrderRoom();
+            BeanUtils.copyProperties(room,assetOrderRoom);
+            assetOrderRoom.setOrderId(assetOrder.getId());
+            assetOrderRoomMapper.insertSelective(assetOrderRoom);
+        }
+        return 1;
     }
 
     private void handleSkuStockCode(List<PmsSkuStock> skuStockList, Long productId) {
@@ -71,11 +86,11 @@ public class AssetRoomServiceImpl implements AssetRoomService {
     }
 
     @Override
-    public int update(Long id, AssetRoomParam assetRoomParam) {
-        AssetRoom assetRoom = new AssetRoom();
+    public int update(Long id, AssetOrderParam assetRoomParam) {
+        AssetOrder assetRoom = new AssetOrder();
         BeanUtils.copyProperties(assetRoomParam, assetRoom);
         assetRoom.setId(id);
-        return assetRoomMapper.updateByPrimaryKeySelective(assetRoom);
+        return assetOrderMapper.updateByPrimaryKeySelective(assetRoom);
     }
 
     private void handleUpdateSkuStockList(Long id, PmsProductParam productParam) {
@@ -122,27 +137,28 @@ public class AssetRoomServiceImpl implements AssetRoomService {
     }
 
     @Override
-    public List<AssetRoom> list(AssetRoomQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum) {
+    public List<AssetOrder> list(AssetOrderQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
-        AssetRoomExample assetRoomExample = new AssetRoomExample();
-        AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
-        if (assetRoomQueryParam.getKeyword() != null) {
-            criteria.andRoomNumLike("%"+assetRoomQueryParam.getKeyword()+"%"  );
+        AssetOrderExample assetRoomExample = new AssetOrderExample();
+        AssetOrderExample.Criteria criteria = assetRoomExample.createCriteria();
+        if (StrUtil.isNotBlank(assetRoomQueryParam.getOrderNum()) ) {
+            criteria.andOrderNumLike("%"+assetRoomQueryParam.getOrderNum()+"%"  );
         }
-        if (assetRoomQueryParam.getFloorId() != null) {
-            criteria.andFloorIdEqualTo(assetRoomQueryParam.getFloorId());
+        if (StrUtil.isNotBlank(assetRoomQueryParam.getZlr()) ) {
+            criteria.andZlrLike("%"+assetRoomQueryParam.getZlr()+"%"  );
         }
-        return assetRoomMapper.selectByExample(assetRoomExample);
+        assetRoomExample.setOrderByClause("order_num desc");
+        return assetOrderMapper.selectByExample(assetRoomExample);
     }
 
     @Override
     public int updateVerifyStatus(List<Long> ids, Integer verifyStatus, String detail) {
-        AssetRoom assetRoom = new AssetRoom();
+        AssetOrder assetRoom = new AssetOrder();
        // assetRoom.setVerifyStatus(verifyStatus);
-        AssetRoomExample example = new AssetRoomExample();
+        AssetOrderExample example = new AssetOrderExample();
         example.createCriteria().andIdIn(ids);
         List<PmsProductVertifyRecord> list = new ArrayList<>();
-        int count = assetRoomMapper.updateByExampleSelective(assetRoom, example);
+        int count = assetOrderMapper.updateByExampleSelective(assetRoom, example);
         //修改完审核状态后插入审核记录
         for (Long id : ids) {
             PmsProductVertifyRecord record = new PmsProductVertifyRecord();
@@ -159,55 +175,55 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
     @Override
     public int updatePublishStatus(List<Long> ids, Integer publishStatus) {
-        AssetRoom assetRoom = new AssetRoom();
+        AssetOrder assetRoom = new AssetOrder();
         //assetRoom.setPublishStatus(publishStatus);
-        AssetRoomExample example = new AssetRoomExample();
+        AssetOrderExample example = new AssetOrderExample();
         example.createCriteria().andIdIn(ids);
-        return assetRoomMapper.updateByExampleSelective(assetRoom, example);
+        return assetOrderMapper.updateByExampleSelective(assetRoom, example);
     }
 
     @Override
     public int updateRecommendStatus(List<Long> ids, Integer recommendStatus) {
-        AssetRoom assetRoom = new AssetRoom();
+        AssetOrder assetRoom = new AssetOrder();
         //assetRoom.setRecommandStatus(recommendStatus);
-        AssetRoomExample example = new AssetRoomExample();
+        AssetOrderExample example = new AssetOrderExample();
         example.createCriteria().andIdIn(ids);
-        return assetRoomMapper.updateByExampleSelective(assetRoom, example);
+        return assetOrderMapper.updateByExampleSelective(assetRoom, example);
     }
 
     @Override
     public int updateNewStatus(List<Long> ids, Integer newStatus) {
-        AssetRoom assetRoom = new AssetRoom();
+        AssetOrder assetRoom = new AssetOrder();
         //assetRoom.setNewStatus(newStatus);
-        AssetRoomExample example = new AssetRoomExample();
+        AssetOrderExample example = new AssetOrderExample();
         example.createCriteria().andIdIn(ids);
-        return assetRoomMapper.updateByExampleSelective(assetRoom, example);
+        return assetOrderMapper.updateByExampleSelective(assetRoom, example);
     }
 
     @Override
     public int updateDeleteStatus(List<Long> ids, Integer deleteStatus) {
-        AssetRoom assetRoom = new AssetRoom();
+        AssetOrder assetRoom = new AssetOrder();
         //assetRoom.setDeleteStatus(deleteStatus);
-        AssetRoomExample example = new AssetRoomExample();
+        AssetOrderExample example = new AssetOrderExample();
         example.createCriteria().andIdIn(ids);
-        return assetRoomMapper.updateByExampleSelective(assetRoom, example);
+        return assetOrderMapper.updateByExampleSelective(assetRoom, example);
     }
 
     @Override
-    public List<AssetRoom> list(String keyword) {
-        AssetRoomExample assetRoomExample = new AssetRoomExample();
-        AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
+    public List<AssetOrder> list(String keyword) {
+        AssetOrderExample assetRoomExample = new AssetOrderExample();
+        AssetOrderExample.Criteria criteria = assetRoomExample.createCriteria();
         //criteria.andDeleteStatusEqualTo(0);
-        if(!StrUtil.isEmpty(keyword)){
+      /*  if(!StrUtil.isEmpty(keyword)){
             criteria.andRoomNumLike("%" + keyword + "%");
           //  assetRoomExample.or().andDeleteStatusEqualTo(0).andProductSnLike("%" + keyword + "%");
-        }
-        return assetRoomMapper.selectByExample(assetRoomExample);
+        }*/
+        return assetOrderMapper.selectByExample(assetRoomExample);
     }
 
     @Override
-    public AssetRoom getBrand(Long id) {
-        return assetRoomMapper.selectByPrimaryKey(id);
+    public AssetOrder getBrand(Long id) {
+        return assetOrderMapper.selectByPrimaryKey(id);
     }
 
     /**
@@ -236,24 +252,24 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
     @Override
     public int updateFactoryStatus(List<Long> ids, String zszt) {
-        AssetRoom assetRoom = new AssetRoom();
-        assetRoom.setZszt(zszt);
-        AssetRoomExample assetRoomExample = new AssetRoomExample();
+        AssetOrder assetRoom = new AssetOrder();
+       // assetRoom.setZszt(zszt);
+        AssetOrderExample assetRoomExample = new AssetOrderExample();
         assetRoomExample.createCriteria().andIdIn(ids);
-        return assetRoomMapper.updateByExampleSelective(assetRoom, assetRoomExample);
+        return assetOrderMapper.updateByExampleSelective(assetRoom, assetRoomExample);
     }
 
     @Override
     public int updateIsOccupancy(List<Long> ids, String isOccupancy) {
-        AssetRoom assetRoom = new AssetRoom();
-        assetRoom.setIsOccupancy(isOccupancy);
-        AssetRoomExample assetRoomExample = new AssetRoomExample();
+        AssetOrder assetRoom = new AssetOrder();
+      //  assetRoom.setIsOccupancy(isOccupancy);
+        AssetOrderExample assetRoomExample = new AssetOrderExample();
         assetRoomExample.createCriteria().andIdIn(ids);
-        return assetRoomMapper.updateByExampleSelective(assetRoom, assetRoomExample);
+        return assetOrderMapper.updateByExampleSelective(assetRoom, assetRoomExample);
     }
     @Override
     public int deleteBrand(Long id) {
-        return assetRoomMapper.deleteByPrimaryKey(id);
+        return assetOrderMapper.deleteByPrimaryKey(id);
     }
 
     @Override
@@ -262,33 +278,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
     }
 
     @Override
-    public List<String> getLc(Long floorId) {
-
-        AssetRoomExample assetRoomExample = new AssetRoomExample();
-        AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
-        //criteria.andDeleteStatusEqualTo(0);
-        if(floorId!=null){
-            criteria.andFloorIdEqualTo(floorId);
-        }
-        List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
-        Set<String> collect = assetRooms.stream().map(AssetRoom::getFloorNum).collect(Collectors.toSet());
-      List<String> list=new ArrayList<>(collect);
-        list.sort(Comparator.comparing(o -> o != null ? o : null, Comparator.nullsLast(String::compareTo)));
-        return list;
-    }
-    @Override
-    public  List<AssetRoom> getFj(Long floorId,String floor) {
-
-        AssetRoomExample assetRoomExample = new AssetRoomExample();
-        AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
-        //criteria.andDeleteStatusEqualTo(0);
-        if(floorId!=null){
-            criteria.andFloorIdEqualTo(floorId);
-        }
-        if(StrUtil.isNotBlank(floor)){
-            criteria.andFloorNumEqualTo(floor);
-        }
-        List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
-        return assetRooms;
+    public List<AssetOrderRoomDto> getOrderRoom(Long id) {
+        return  assetOrderRoomMapper.selectByOrderId(id);
     }
 }

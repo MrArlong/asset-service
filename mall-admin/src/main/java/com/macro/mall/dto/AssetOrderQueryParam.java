@@ -10,9 +10,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AssetRoomQueryParam {
+public class AssetOrderQueryParam {
     @ApiModelProperty("订单编号")
-    private String keyword;
-    @ApiModelProperty("资产编号")
-    private Long floorId;
+    private String orderNum;
+    @ApiModelProperty("租赁人")
+    private String zlr ;
 }
