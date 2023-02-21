@@ -15,6 +15,8 @@
     <result column="sort" jdbcType="INTEGER" property="sort" />
     <result column="longitude" jdbcType="VARCHAR" property="longitude" />
     <result column="Latitude" jdbcType="VARCHAR" property="latitude" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="jzprice" jdbcType="DECIMAL" property="jzprice" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -76,7 +78,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, name, address, region, lxr, lxdh, syzt, zszt, lbtp, isfinish, sort, longitude, 
-    Latitude
+    Latitude, price, jzprice
   </sql>
   <select id="selectByExample" parameterType="com.macro.mall.model.AssetFloorExample" resultMap="BaseResultMap">
     select
@@ -115,11 +117,13 @@
     insert into asset_floor (name, address, region, 
       lxr, lxdh, syzt, zszt, 
       lbtp, isfinish, sort, 
-      longitude, Latitude)
+      longitude, Latitude, price,jzprice
+      )
     values (#{name,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, 
       #{lxr,jdbcType=VARCHAR}, #{lxdh,jdbcType=VARCHAR}, #{syzt,jdbcType=VARCHAR}, #{zszt,jdbcType=VARCHAR}, 
       #{lbtp,jdbcType=VARCHAR}, #{isfinish,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
-      #{longitude,jdbcType=VARCHAR}, #{latitude,jdbcType=VARCHAR})
+      #{longitude,jdbcType=VARCHAR}, #{latitude,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{jzprice,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.macro.mall.model.AssetFloor">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -163,6 +167,12 @@
       <if test="latitude != null">
         Latitude,
       </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="jzprice != null">
+        jzprice,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="name != null">
@@ -200,6 +210,12 @@
       </if>
       <if test="latitude != null">
         #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="jzprice != null">
+        #{jzprice,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -251,6 +267,12 @@
       <if test="row.latitude != null">
         Latitude = #{row.latitude,jdbcType=VARCHAR},
       </if>
+      <if test="row.price != null">
+        price = #{row.price,jdbcType=DECIMAL},
+      </if>
+      <if test="row.jzprice != null">
+        price = #{row.jzprice,jdbcType=DECIMAL},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -270,7 +292,9 @@
       isfinish = #{row.isfinish,jdbcType=VARCHAR},
       sort = #{row.sort,jdbcType=INTEGER},
       longitude = #{row.longitude,jdbcType=VARCHAR},
-      Latitude = #{row.latitude,jdbcType=VARCHAR}
+      Latitude = #{row.latitude,jdbcType=VARCHAR},
+      price = #{row.price,jdbcType=DECIMAL},
+    jzprice = #{row.jzprice,jdbcType=DECIMAL}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -314,6 +338,12 @@
       <if test="latitude != null">
         Latitude = #{latitude,jdbcType=VARCHAR},
       </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="jzprice != null">
+        jzprice = #{jzprice,jdbcType=DECIMAL},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -330,7 +360,9 @@
       isfinish = #{isfinish,jdbcType=VARCHAR},
       sort = #{sort,jdbcType=INTEGER},
       longitude = #{longitude,jdbcType=VARCHAR},
-      Latitude = #{latitude,jdbcType=VARCHAR}
+      Latitude = #{latitude,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+    jzprice = #{jzprice,jdbcType=DECIMAL}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

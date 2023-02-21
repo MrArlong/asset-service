@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import java.math.BigDecimal;
 
 /**
  * 资产请求参数
@@ -52,6 +53,12 @@ public class AssetFloorParam {
 
     @ApiModelProperty(value = "地图经纬度")
     private String Latitude;
+
+    @ApiModelProperty(value = "毛坯价格")
+    private BigDecimal price;
+
+    @ApiModelProperty(value = "精装价格")
+    private BigDecimal jzprice;
 
 
 }

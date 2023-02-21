@@ -90,4 +90,6 @@ public interface AssetRoomService {
 
     List<String> getLc(Long floorId);
     List<AssetRoom> getFj(Long floorId,String floor);
+
+    List<AssetRoom> findByFloorId(Long floorId);
 }

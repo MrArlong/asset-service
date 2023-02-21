@@ -1,6 +1,5 @@
 package com.macro.mall.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -27,7 +26,6 @@ public class AssetOrder implements Serializable {
     @ApiModelProperty(value = "租赁人联系电话")
     private String zlrlxdh;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty(value = "支付时间")
     private Date zfsj;
 

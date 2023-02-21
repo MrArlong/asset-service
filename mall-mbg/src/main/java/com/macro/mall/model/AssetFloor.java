@@ -2,6 +2,7 @@ package com.macro.mall.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class AssetFloor implements Serializable {
     private Long id;
@@ -41,6 +42,12 @@ public class AssetFloor implements Serializable {
 
     @ApiModelProperty(value = "纬度")
     private String latitude;
+
+    @ApiModelProperty(value = "毛坯价格")
+    private BigDecimal price;
+
+    @ApiModelProperty(value = "精装价格")
+    private BigDecimal jzprice;
 
     private static final long serialVersionUID = 1L;
 
@@ -148,6 +155,20 @@ public class AssetFloor implements Serializable {
         this.latitude = latitude;
     }
 
+    public BigDecimal getPrice() {
+        return price;
+    }
+    public BigDecimal getJzprice() {
+        return jzprice;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+    public void setJzprice(BigDecimal jzprice) {
+        this.jzprice = jzprice;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -167,6 +188,8 @@ public class AssetFloor implements Serializable {
         sb.append(", sort=").append(sort);
         sb.append(", longitude=").append(longitude);
         sb.append(", latitude=").append(latitude);
+        sb.append(", price=").append(price);
+        sb.append(", jzprice=").append(jzprice);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

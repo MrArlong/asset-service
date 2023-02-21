@@ -48,4 +48,7 @@ public class AssetRoomParam {
 
     @ApiModelProperty(value = "房间描述")
     private String description;
+
+    @ApiModelProperty(value = "展示状态")
+    private String zszt;
 }

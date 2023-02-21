@@ -7,6 +7,7 @@ import com.macro.mall.mapper.PmsProductMapper;
 import com.macro.mall.mapper.AssetFloorMapper;
 import com.macro.mall.model.*;
 import com.macro.mall.service.asset.AssetFloorService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,5 +95,31 @@ public class AssetFloorServiceImpl implements AssetFloorService {
         AssetFloorExample assetFloorExample = new AssetFloorExample();
         assetFloorExample.createCriteria().andIdIn(ids);
         return assetFloorMapper.updateByExampleSelective(assetFloor, assetFloorExample);
+    }
+
+    @Override
+    public List<AssetFloor> wxHostFloorList() {
+        AssetFloorExample assetFloorExample = new AssetFloorExample();
+        assetFloorExample.setOrderByClause("sort asc");
+        AssetFloorExample.Criteria criteria = assetFloorExample.createCriteria();
+        // 必须为上架
+        criteria.andZsztEqualTo("1");
+        // 必须为出租状态
+        criteria.andSyztEqualTo("2");
+
+        PageHelper.startPage(1,10);
+
+        return assetFloorMapper.selectByExample(assetFloorExample);
+    }
+
+    @Override
+    public List<AssetFloor> floorListAll(String syzt) {
+        AssetFloorExample assetFloorExample = new AssetFloorExample();
+        assetFloorExample.setOrderByClause("sort asc");
+        AssetFloorExample.Criteria criteria = assetFloorExample.createCriteria();
+       if(StringUtils.isNotBlank(syzt)){
+           criteria.andSyztEqualTo(syzt);
+       }
+        return assetFloorMapper.selectByExample(assetFloorExample);
     }
 }

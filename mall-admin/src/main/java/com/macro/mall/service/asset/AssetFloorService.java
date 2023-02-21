@@ -56,4 +56,8 @@ public interface AssetFloorService {
      * 修改展示状态
      */
     int updateFactoryStatus(List<Long> ids, String zszt);
+
+    List<AssetFloor> wxHostFloorList();
+
+    List<AssetFloor> floorListAll(String syzt);
 }

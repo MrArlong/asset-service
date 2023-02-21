@@ -291,4 +291,13 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
         return assetRooms;
     }
+
+    @Override
+    public List<AssetRoom> findByFloorId(Long floorId) {
+        AssetRoomExample assetRoomExample = new AssetRoomExample();
+        AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
+        criteria.andFloorIdEqualTo(floorId);
+        criteria.andZsztEqualTo("1");
+        return assetRoomMapper.selectByExample(assetRoomExample);
+    }
 }
