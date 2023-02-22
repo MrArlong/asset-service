@@ -109,6 +109,47 @@
      left join  asset_room ar on aor.room_id=ar.id
     where order_id = #{id,jdbcType=BIGINT}
   </select>
+
+  <select id="selectByLqtx" parameterType="java.lang.Long" resultMap="BasMap">
+    select
+    af.name,ar.room_num,ar.floor_num,aor.id, aor.order_id,  aor.begin_time, aor.end_time, aor.price
+    from asset_order_room aor left join asset_floor af on aor.floor_id=af.id
+    left join  asset_room ar on aor.room_id=ar.id
+
+    <if test="_parameter != null">
+      <where>
+        <foreach collection="oredCriteria" item="criteria" separator="or">
+          <if test="criteria.valid">
+            <trim prefix="(" prefixOverrides="and" suffix=")">
+              <foreach collection="criteria.criteria" item="criterion">
+                <choose>
+                  <when test="criterion.noValue">
+                    and aor.${criterion.condition}
+                  </when>
+                  <when test="criterion.singleValue">
+                    and aor.${criterion.condition} #{criterion.value}
+                  </when>
+                  <when test="criterion.betweenValue">
+                    and aor.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                  </when>
+                  <when test="criterion.listValue">
+                    and aor.${criterion.condition}
+                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                      #{listItem}
+                    </foreach>
+                  </when>
+                </choose>
+              </foreach>
+            </trim>
+          </if>
+        </foreach>
+      </where>
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from asset_order_room
     where id = #{id,jdbcType=BIGINT}
@@ -258,4 +299,10 @@
       price = #{price,jdbcType=DECIMAL}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="updateAll" parameterType="com.macro.mall.model.AssetRoom">
+    update asset_room
+    set is_occupancy='0'
+  </update>
+
+
 </mapper>

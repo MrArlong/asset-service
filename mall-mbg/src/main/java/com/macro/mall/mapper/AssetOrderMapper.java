@@ -27,4 +27,6 @@ public interface AssetOrderMapper {
     int updateByPrimaryKeySelective(AssetOrder row);
 
     int updateByPrimaryKey(AssetOrder row);
+
+
 }

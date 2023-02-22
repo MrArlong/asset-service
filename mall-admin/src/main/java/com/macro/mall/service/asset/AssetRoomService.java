@@ -23,11 +23,6 @@ public interface AssetRoomService {
     int create(AssetRoomParam assetRoomParam);
 
     /**
-     * 根据商品编号获取更新信息
-     */
-    PmsProductResult getUpdateInfo(Long id);
-
-    /**
      * 更新商品
      */
     @Transactional

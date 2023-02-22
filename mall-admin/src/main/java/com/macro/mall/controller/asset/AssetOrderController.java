@@ -203,4 +203,15 @@ public class AssetOrderController {
             return CommonResult.failed();
         }
     }
+
+
+    @ApiOperation("临期预警")
+    @RequestMapping(value = "/lqyj", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult<CommonPage<AssetOrderRoomDto>> lqyj(AssetRoomQueryParam assetRoomQueryParam,
+                                                         @RequestParam(value = "pageSize", defaultValue = "5") Integer pageSize,
+                                                         @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
+        List<AssetOrderRoomDto> assetRooms = assetOrderService.lqyj(assetRoomQueryParam, pageSize, pageNum);
+        return CommonResult.success(CommonPage.restPage(assetRooms));
+    }
 }

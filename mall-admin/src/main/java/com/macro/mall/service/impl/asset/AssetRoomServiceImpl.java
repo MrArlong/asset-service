@@ -9,6 +9,8 @@ import com.macro.mall.dao.*;
 import com.macro.mall.dto.*;
 import com.macro.mall.mapper.*;
 import com.macro.mall.model.*;
+import com.macro.mall.service.asset.AssetFloorService;
+import com.macro.mall.service.asset.AssetOrderService;
 import com.macro.mall.service.asset.AssetRoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +34,11 @@ public class AssetRoomServiceImpl implements AssetRoomService {
     @Autowired
     private AssetRoomMapper assetRoomMapper;
     @Autowired
-    private PmsSkuStockDao skuStockDao;
+    private AssetOrderRoomMapper assetOrderRoomMapper;
     @Autowired
-    private PmsSkuStockMapper skuStockMapper;
+    private AssetOrderService assetOrderService;
     @Autowired
-    private PmsProductDao productDao;
+    private AssetFloorService assetFloorService;
     @Autowired
     private PmsProductVertifyRecordDao productVertifyRecordDao;
 
@@ -47,29 +49,6 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         return assetRoomMapper.insertSelective(assetRoom);
     }
 
-    private void handleSkuStockCode(List<PmsSkuStock> skuStockList, Long productId) {
-        if(CollectionUtils.isEmpty(skuStockList))return;
-        for(int i=0;i<skuStockList.size();i++){
-            PmsSkuStock skuStock = skuStockList.get(i);
-            if(StrUtil.isEmpty(skuStock.getSkuCode())){
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                StringBuilder sb = new StringBuilder();
-                //日期
-                sb.append(sdf.format(new Date()));
-                //四位商品id
-                sb.append(String.format("%04d", productId));
-                //三位索引id
-                sb.append(String.format("%03d", i+1));
-                skuStock.setSkuCode(sb.toString());
-            }
-        }
-    }
-
-    @Override
-    public PmsProductResult getUpdateInfo(Long id) {
-        return productDao.getUpdateInfo(id);
-    }
-
     @Override
     public int update(Long id, AssetRoomParam assetRoomParam) {
         AssetRoom assetRoom = new AssetRoom();
@@ -78,73 +57,43 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         return assetRoomMapper.updateByPrimaryKeySelective(assetRoom);
     }
 
-    private void handleUpdateSkuStockList(Long id, PmsProductParam productParam) {
-        //当前的sku信息
-        List<PmsSkuStock> currSkuList = productParam.getSkuStockList();
-        //当前没有sku直接删除
-        if(CollUtil.isEmpty(currSkuList)){
-            PmsSkuStockExample skuStockExample = new PmsSkuStockExample();
-            skuStockExample.createCriteria().andProductIdEqualTo(id);
-            skuStockMapper.deleteByExample(skuStockExample);
-            return;
-        }
-        //获取初始sku信息
-        PmsSkuStockExample skuStockExample = new PmsSkuStockExample();
-        skuStockExample.createCriteria().andProductIdEqualTo(id);
-        List<PmsSkuStock> oriStuList = skuStockMapper.selectByExample(skuStockExample);
-        //获取新增sku信息
-        List<PmsSkuStock> insertSkuList = currSkuList.stream().filter(item->item.getId()==null).collect(Collectors.toList());
-        //获取需要更新的sku信息
-        List<PmsSkuStock> updateSkuList = currSkuList.stream().filter(item->item.getId()!=null).collect(Collectors.toList());
-        List<Long> updateSkuIds = updateSkuList.stream().map(PmsSkuStock::getId).collect(Collectors.toList());
-        //获取需要删除的sku信息
-        List<PmsSkuStock> removeSkuList = oriStuList.stream().filter(item-> !updateSkuIds.contains(item.getId())).collect(Collectors.toList());
-        handleSkuStockCode(insertSkuList,id);
-        handleSkuStockCode(updateSkuList,id);
-        //新增sku
-        if(CollUtil.isNotEmpty(insertSkuList)){
-            relateAndInsertList(skuStockDao, insertSkuList, id);
-        }
-        //删除sku
-        if(CollUtil.isNotEmpty(removeSkuList)){
-            List<Long> removeSkuIds = removeSkuList.stream().map(PmsSkuStock::getId).collect(Collectors.toList());
-            PmsSkuStockExample removeExample = new PmsSkuStockExample();
-            removeExample.createCriteria().andIdIn(removeSkuIds);
-            skuStockMapper.deleteByExample(removeExample);
-        }
-        //修改sku
-        if(CollUtil.isNotEmpty(updateSkuList)){
-            for (PmsSkuStock pmsSkuStock : updateSkuList) {
-                skuStockMapper.updateByPrimaryKeySelective(pmsSkuStock);
-            }
-        }
-
-    }
-
     @Override
     public List<AssetRoom> list(AssetRoomQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
         AssetRoomExample assetRoomExample = new AssetRoomExample();
         AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
-        if (assetRoomQueryParam.getKeyword() != null) {
-            criteria.andRoomNumLike("%"+assetRoomQueryParam.getKeyword()+"%"  );
+        if(assetRoomQueryParam.getKeyword() != null) {
+            criteria.andRoomNumLike("%" + assetRoomQueryParam.getKeyword() + "%");
         }
-        if (assetRoomQueryParam.getFloorId() != null) {
+        if(assetRoomQueryParam.getFloorId() != null) {
             criteria.andFloorIdEqualTo(assetRoomQueryParam.getFloorId());
         }
-        return assetRoomMapper.selectByExample(assetRoomExample);
+        List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
+        assetRooms.stream().forEach(a -> {
+            AssetFloor brand = assetFloorService.getBrand(a.getFloorId());
+            if(Objects.nonNull(brand)){
+                a.setFloorName(brand.getName());
+            }
+         /*   List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
+            if(CollUtil.isEmpty(assetOrderRooms)) {
+                a.setIsOccupancy("0");
+            }else {
+                a.setIsOccupancy("1");
+            }*/
+        });
+        return assetRooms;
     }
 
     @Override
     public int updateVerifyStatus(List<Long> ids, Integer verifyStatus, String detail) {
         AssetRoom assetRoom = new AssetRoom();
-       // assetRoom.setVerifyStatus(verifyStatus);
+        // assetRoom.setVerifyStatus(verifyStatus);
         AssetRoomExample example = new AssetRoomExample();
         example.createCriteria().andIdIn(ids);
         List<PmsProductVertifyRecord> list = new ArrayList<>();
         int count = assetRoomMapper.updateByExampleSelective(assetRoom, example);
         //修改完审核状态后插入审核记录
-        for (Long id : ids) {
+        for(Long id : ids) {
             PmsProductVertifyRecord record = new PmsProductVertifyRecord();
             record.setProductId(id);
             record.setCreateTime(new Date());
@@ -198,9 +147,9 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         AssetRoomExample assetRoomExample = new AssetRoomExample();
         AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
         //criteria.andDeleteStatusEqualTo(0);
-        if(!StrUtil.isEmpty(keyword)){
+        if(!StrUtil.isEmpty(keyword)) {
             criteria.andRoomNumLike("%" + keyword + "%");
-          //  assetRoomExample.or().andDeleteStatusEqualTo(0).andProductSnLike("%" + keyword + "%");
+            //  assetRoomExample.or().andDeleteStatusEqualTo(0).andProductSnLike("%" + keyword + "%");
         }
         return assetRoomMapper.selectByExample(assetRoomExample);
     }
@@ -212,15 +161,14 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
     /**
      * 建立和插入关系表操作
-     *
      * @param dao       可以操作的dao
      * @param dataList  要插入的数据
      * @param productId 建立关系的id
      */
     private void relateAndInsertList(Object dao, List dataList, Long productId) {
         try {
-            if (CollectionUtils.isEmpty(dataList)) return;
-            for (Object item : dataList) {
+            if(CollectionUtils.isEmpty(dataList)) return;
+            for(Object item : dataList) {
                 Method setId = item.getClass().getMethod("setId", Long.class);
                 setId.invoke(item, (Long) null);
                 Method setProductId = item.getClass().getMethod("setProductId", Long.class);
@@ -228,7 +176,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
             }
             Method insertList = dao.getClass().getMethod("insertList", List.class);
             insertList.invoke(dao, dataList);
-        } catch (Exception e) {
+        }catch(Exception e) {
             LOGGER.warn("创建产品出错:{}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
@@ -251,6 +199,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         assetRoomExample.createCriteria().andIdIn(ids);
         return assetRoomMapper.updateByExampleSelective(assetRoom, assetRoomExample);
     }
+
     @Override
     public int deleteBrand(Long id) {
         return assetRoomMapper.deleteByPrimaryKey(id);
@@ -267,25 +216,26 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         AssetRoomExample assetRoomExample = new AssetRoomExample();
         AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
         //criteria.andDeleteStatusEqualTo(0);
-        if(floorId!=null){
+        if(floorId != null) {
             criteria.andFloorIdEqualTo(floorId);
         }
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
         Set<String> collect = assetRooms.stream().map(AssetRoom::getFloorNum).collect(Collectors.toSet());
-      List<String> list=new ArrayList<>(collect);
+        List<String> list = new ArrayList<>(collect);
         list.sort(Comparator.comparing(o -> o != null ? o : null, Comparator.nullsLast(String::compareTo)));
         return list;
     }
+
     @Override
-    public  List<AssetRoom> getFj(Long floorId,String floor) {
+    public List<AssetRoom> getFj(Long floorId, String floor) {
 
         AssetRoomExample assetRoomExample = new AssetRoomExample();
         AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
         //criteria.andDeleteStatusEqualTo(0);
-        if(floorId!=null){
+        if(floorId != null) {
             criteria.andFloorIdEqualTo(floorId);
         }
-        if(StrUtil.isNotBlank(floor)){
+        if(StrUtil.isNotBlank(floor)) {
             criteria.andFloorNumEqualTo(floor);
         }
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
@@ -298,6 +248,19 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
         criteria.andFloorIdEqualTo(floorId);
         criteria.andZsztEqualTo("1");
-        return assetRoomMapper.selectByExample(assetRoomExample);
+
+        List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
+        assetRooms.stream().forEach(a -> {
+          /*  List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
+            if(CollUtil.isEmpty(assetOrderRooms)) {
+                a.setIsOccupancy("0");
+            }else {
+                a.setIsOccupancy("1");
+            }*/
+        });
+
+        return assetRooms;
     }
+
+
 }

@@ -3,13 +3,11 @@ package com.macro.mall.service.asset;
 import com.macro.mall.dto.*;
 import com.macro.mall.model.AssetOrder;
 import com.macro.mall.model.AssetOrderRoom;
-import com.macro.mall.model.AssetRoom;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 房间管理Service
@@ -89,4 +87,13 @@ public interface AssetOrderService {
     Long getOrderNum();
 
     List<AssetOrderRoomDto> getOrderRoom(Long id);
+
+    List<AssetOrderRoomDto> lqyj(AssetRoomQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum);
+    List<AssetOrderRoom> selectIsOccupancyList();
+
+
+    int updateAll();
+    int updateIsOccupancy(List<Long> ids);
+
+    List<AssetOrderRoom> orderRoomms(Long roomId);
 }

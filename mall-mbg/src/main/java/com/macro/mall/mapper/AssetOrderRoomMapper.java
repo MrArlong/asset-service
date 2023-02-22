@@ -3,6 +3,8 @@ package com.macro.mall.mapper;
 import com.macro.mall.dto.AssetOrderRoomDto;
 import com.macro.mall.model.AssetOrderRoom;
 import com.macro.mall.model.AssetOrderRoomExample;
+
+import java.util.Date;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,4 +32,8 @@ public interface AssetOrderRoomMapper {
     int updateByPrimaryKey(AssetOrderRoom row);
 
     List<AssetOrderRoomDto> selectByOrderId(Long id);
+    List<AssetOrderRoomDto> selectByLqtx(AssetOrderRoomExample example);
+
+    int updateAll();
+
 }

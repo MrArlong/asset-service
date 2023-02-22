@@ -7,6 +7,9 @@ public class AssetRoom implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "资产id")
+    private String floorName;
+
+    @ApiModelProperty(value = "资产id")
     private Long floorId;
 
     @ApiModelProperty(value = "房间号")
@@ -52,6 +55,14 @@ public class AssetRoom implements Serializable {
 
     public void setFloorId(Long floorId) {
         this.floorId = floorId;
+    }
+
+    public String getFloorName() {
+        return floorName;
+    }
+
+    public void setFloorName(String floorName) {
+        this.floorName = floorName;
     }
 
     public String getRoomNum() {

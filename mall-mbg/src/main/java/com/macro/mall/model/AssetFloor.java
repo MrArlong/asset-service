@@ -49,6 +49,13 @@ public class AssetFloor implements Serializable {
     @ApiModelProperty(value = "精装价格")
     private BigDecimal jzprice;
 
+    @ApiModelProperty(value = "总数")
+    private Integer sum;
+    @ApiModelProperty(value = "已租")
+    private Integer totalLet;
+    @ApiModelProperty(value = "未租")
+    private Integer totalUnlet;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -57,6 +64,30 @@ public class AssetFloor implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getSum() {
+        return sum;
+    }
+
+    public void setSum(Integer sum) {
+        this.sum = sum;
+    }
+
+    public Integer getTotalLet() {
+        return totalLet;
+    }
+
+    public void setTotalLet(Integer totalLet) {
+        this.totalLet = totalLet;
+    }
+
+    public Integer getTotalUnlet() {
+        return totalUnlet;
+    }
+
+    public void setTotalUnlet(Integer totalUnlet) {
+        this.totalUnlet = totalUnlet;
     }
 
     public String getName() {

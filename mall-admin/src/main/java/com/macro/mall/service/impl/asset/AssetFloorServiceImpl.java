@@ -3,16 +3,19 @@ package com.macro.mall.service.impl.asset;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.macro.mall.dto.AssetFloorParam;
+import com.macro.mall.mapper.AssetRoomMapper;
 import com.macro.mall.mapper.PmsProductMapper;
 import com.macro.mall.mapper.AssetFloorMapper;
 import com.macro.mall.model.*;
 import com.macro.mall.service.asset.AssetFloorService;
+import com.macro.mall.service.asset.AssetRoomService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 商品品牌管理Service实现类
@@ -23,7 +26,7 @@ public class AssetFloorServiceImpl implements AssetFloorService {
     @Autowired
     private AssetFloorMapper assetFloorMapper;
     @Autowired
-    private PmsProductMapper productMapper;
+    private AssetRoomService assetRoomService;
 
     @Override
     public List<AssetFloor> listAllBrand() {
@@ -108,8 +111,16 @@ public class AssetFloorServiceImpl implements AssetFloorService {
         criteria.andSyztEqualTo("2");
 
         PageHelper.startPage(1,10);
-
-        return assetFloorMapper.selectByExample(assetFloorExample);
+        List<AssetFloor> assetFloors = assetFloorMapper.selectByExample(assetFloorExample);
+        assetFloors.stream().forEach(a->{
+            List<AssetRoom> byFloorId = assetRoomService.findByFloorId(a.getId());
+            a.setSum(byFloorId.size());
+            long totalUnlet = byFloorId.stream().filter(b -> b.getIsOccupancy().equals("0")).count();
+            a.setTotalUnlet(new Long(totalUnlet).intValue());
+            long totalLet = byFloorId.stream().filter(b -> b.getIsOccupancy().equals("1")).count();
+            a.setTotalLet(new Long(totalLet).intValue());
+        });
+        return assetFloors;
     }
 
     @Override
@@ -120,6 +131,15 @@ public class AssetFloorServiceImpl implements AssetFloorService {
        if(StringUtils.isNotBlank(syzt)){
            criteria.andSyztEqualTo(syzt);
        }
-        return assetFloorMapper.selectByExample(assetFloorExample);
+        List<AssetFloor> assetFloors = assetFloorMapper.selectByExample(assetFloorExample);
+        assetFloors.stream().forEach(a->{
+            List<AssetRoom> byFloorId = assetRoomService.findByFloorId(a.getId());
+            a.setSum(byFloorId.size());
+            long totalUnlet = byFloorId.stream().filter(b -> b.getIsOccupancy().equals("0")).count();
+            a.setTotalUnlet(new Long(totalUnlet).intValue());
+            long totalLet = byFloorId.stream().filter(b -> b.getIsOccupancy().equals("1")).count();
+            a.setTotalLet(new Long(totalLet).intValue());
+        });
+        return assetFloors;
     }
 }

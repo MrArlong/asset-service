@@ -55,15 +55,6 @@ public class AssetRoomController {
             return CommonResult.failed();
         }
     }
-
-    @ApiOperation("根据商品id获取商品编辑信息")
-    @RequestMapping(value = "/updateInfo/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    public CommonResult<PmsProductResult> getUpdateInfo(@PathVariable Long id) {
-        PmsProductResult productResult = assetRoomService.getUpdateInfo(id);
-        return CommonResult.success(productResult);
-    }
-
     @ApiOperation("更新商品")
     @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
     @ResponseBody

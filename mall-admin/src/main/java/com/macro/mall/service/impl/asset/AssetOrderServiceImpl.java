@@ -1,6 +1,8 @@
 package com.macro.mall.service.impl.asset;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.macro.mall.dao.PmsProductDao;
@@ -9,6 +11,7 @@ import com.macro.mall.dao.PmsSkuStockDao;
 import com.macro.mall.dto.*;
 import com.macro.mall.mapper.AssetOrderMapper;
 import com.macro.mall.mapper.AssetOrderRoomMapper;
+import com.macro.mall.mapper.AssetRoomMapper;
 import com.macro.mall.mapper.PmsSkuStockMapper;
 import com.macro.mall.model.*;
 import com.macro.mall.service.asset.AssetOrderService;
@@ -24,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +38,8 @@ public class AssetOrderServiceImpl implements AssetOrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AssetOrderServiceImpl.class);
     @Autowired
     private AssetOrderMapper assetOrderMapper;
+    @Autowired
+    private AssetRoomMapper assetRoomMapper;
     @Autowired
     private AssetOrderRoomMapper assetOrderRoomMapper;
     @Autowired
@@ -280,5 +284,52 @@ public class AssetOrderServiceImpl implements AssetOrderService {
     @Override
     public List<AssetOrderRoomDto> getOrderRoom(Long id) {
         return  assetOrderRoomMapper.selectByOrderId(id);
+    }
+
+    @Override
+    public List<AssetOrderRoomDto> lqyj(AssetRoomQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum) {
+       PageHelper.startPage(pageNum,pageSize);
+        AssetOrderRoomExample assetRoomExample = new AssetOrderRoomExample();
+        AssetOrderRoomExample.Criteria criteria = assetRoomExample.createCriteria();
+        if(assetRoomQueryParam.getFloorId()!=null){
+            criteria.andFloorIdEqualTo(assetRoomQueryParam.getFloorId());
+        }
+        DateTime dateTime = DateUtil.offsetDay(new Date(), 31);
+        criteria.andEndTimeBetween(new Date(),dateTime);
+        List<AssetOrderRoomDto> assetOrderRooms = assetOrderRoomMapper.selectByLqtx(assetRoomExample);
+        return assetOrderRooms;
+    }
+
+
+    @Override
+    public List<AssetOrderRoom> selectIsOccupancyList() {
+        AssetOrderRoomExample assetRoomExample = new AssetOrderRoomExample();
+        AssetOrderRoomExample.Criteria criteria = assetRoomExample.createCriteria();
+        criteria.andEndTimeGreaterThan(new Date());
+        List<AssetOrderRoom> assetOrderRooms = assetOrderRoomMapper.selectByExample(assetRoomExample);
+        return assetOrderRooms;
+    }
+
+    @Override
+    public int updateAll() {
+        return assetOrderRoomMapper.updateAll();
+    }
+    @Override
+    public int updateIsOccupancy(List<Long> ids) {
+        AssetRoom assetRoom = new AssetRoom();
+        assetRoom.setIsOccupancy("1");
+        AssetRoomExample assetRoomExample = new AssetRoomExample();
+        assetRoomExample.createCriteria().andIdIn(ids);
+        return assetRoomMapper.updateByExampleSelective(assetRoom, assetRoomExample);
+
+    }
+
+    public List<AssetOrderRoom> orderRoomms(Long roomId){
+        AssetOrderRoomExample room = new AssetOrderRoomExample();
+        AssetOrderRoomExample.Criteria roomCriteria = room.createCriteria();
+        roomCriteria.andRoomIdEqualTo(roomId);
+        roomCriteria.andEndTimeGreaterThan(new Date());
+        List<AssetOrderRoom> assetOrderRooms = assetOrderRoomMapper.selectByExample(room);
+        return assetOrderRooms;
     }
 }
