@@ -9,16 +9,20 @@
     <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="unitprice" jdbcType="VARCHAR" property="unitprice" />
   </resultMap>
   <resultMap id="BasMap" type="com.macro.mall.dto.AssetOrderRoomDto">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="order_id" jdbcType="BIGINT" property="orderId" />
+    <result column="floor_id" jdbcType="BIGINT" property="floorId" />
     <result column="name" jdbcType="VARCHAR" property="floorName" />
     <result column="room_num" jdbcType="VARCHAR" property="roomNum" />
+    <result column="room_id" jdbcType="BIGINT" property="roomId" />
     <result column="floor_num" jdbcType="VARCHAR" property="floorNum" />
     <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="unitprice" jdbcType="VARCHAR" property="unitprice" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -79,7 +83,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, order_id, floor_id, room_id, begin_time, end_time, price
+    id, order_id, floor_id, room_id, begin_time, end_time, price,unitprice
   </sql>
   <select id="selectByExample" parameterType="com.macro.mall.model.AssetOrderRoomExample" resultMap="BaseResultMap">
     select
@@ -104,7 +108,7 @@
 
   <select id="selectByOrderId" parameterType="java.lang.Long" resultMap="BasMap">
     select
-    af.name,ar.room_num,ar.floor_num,aor.id, aor.order_id,  aor.begin_time, aor.end_time, aor.price
+    af.id as floor_id,af.name,ar.id as room_id,ar.room_num,ar.floor_num,aor.id, aor.order_id,  aor.begin_time, aor.end_time, aor.price,aor.unitprice
     from asset_order_room aor left join asset_floor af on aor.floor_id=af.id
      left join  asset_room ar on aor.room_id=ar.id
     where order_id = #{id,jdbcType=BIGINT}
@@ -112,7 +116,7 @@
 
   <select id="selectByLqtx" parameterType="java.lang.Long" resultMap="BasMap">
     select
-    af.name,ar.room_num,ar.floor_num,aor.id, aor.order_id,  aor.begin_time, aor.end_time, aor.price
+    af.name,ar.room_num,ar.floor_num,aor.id, aor.order_id,  aor.begin_time, aor.end_time, aor.price,aor.unitprice
     from asset_order_room aor left join asset_floor af on aor.floor_id=af.id
     left join  asset_room ar on aor.room_id=ar.id
 
@@ -165,10 +169,10 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into asset_order_room (order_id, floor_id, room_id, 
-      begin_time, end_time, price
+      begin_time, end_time, price,unitprice
       )
     values (#{orderId,jdbcType=BIGINT}, #{floorId,jdbcType=BIGINT}, #{roomId,jdbcType=BIGINT}, 
-      #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{price,jdbcType=DECIMAL}
+      #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{price,jdbcType=DECIMAL}, #{unitprice,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.macro.mall.model.AssetOrderRoom">
@@ -195,6 +199,9 @@
       <if test="price != null">
         price,
       </if>
+      <if test="unitprice != null">
+        unitprice,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="orderId != null">
@@ -214,6 +221,9 @@
       </if>
       <if test="price != null">
         #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="unitprice != null">
+        #{unitprice,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -247,6 +257,9 @@
       <if test="row.price != null">
         price = #{row.price,jdbcType=DECIMAL},
       </if>
+      <if test="row.unitprice != null">
+        unitprice = #{row.unitprice,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -260,7 +273,8 @@
       room_id = #{row.roomId,jdbcType=BIGINT},
       begin_time = #{row.beginTime,jdbcType=TIMESTAMP},
       end_time = #{row.endTime,jdbcType=TIMESTAMP},
-      price = #{row.price,jdbcType=DECIMAL}
+      price = #{row.price,jdbcType=DECIMAL},
+    unitprice = #{row.unitprice,jdbcType=VARCHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -286,6 +300,9 @@
       <if test="price != null">
         price = #{price,jdbcType=DECIMAL},
       </if>
+      <if test="unitprice != null">
+        unitprice = #{unitprice,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -296,7 +313,8 @@
       room_id = #{roomId,jdbcType=BIGINT},
       begin_time = #{beginTime,jdbcType=TIMESTAMP},
       end_time = #{endTime,jdbcType=TIMESTAMP},
-      price = #{price,jdbcType=DECIMAL}
+      price = #{price,jdbcType=DECIMAL},
+    unitprice = #{unitprice,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateAll" parameterType="com.macro.mall.model.AssetRoom">

@@ -35,6 +35,9 @@ public class AssetFloorServiceImpl implements AssetFloorService {
 
     @Override
     public int createBrand(AssetFloorParam assetFloorParam) {
+        if(StrUtil.isBlank(assetFloorParam.getSftj())){
+            assetFloorParam.setSftj("0");
+        }
         AssetFloor assetFloor = new AssetFloor();
         BeanUtils.copyProperties(assetFloorParam, assetFloor);
         return assetFloorMapper.insertSelective(assetFloor);
@@ -101,6 +104,15 @@ public class AssetFloorServiceImpl implements AssetFloorService {
     }
 
     @Override
+    public int updateSftjStatus(List<Long> ids, String sftj) {
+        AssetFloor assetFloor = new AssetFloor();
+        assetFloor.setSftj(sftj);
+        AssetFloorExample assetFloorExample = new AssetFloorExample();
+        assetFloorExample.createCriteria().andIdIn(ids);
+        return assetFloorMapper.updateByExampleSelective(assetFloor, assetFloorExample);
+    }
+
+    @Override
     public List<AssetFloor> wxHostFloorList() {
         AssetFloorExample assetFloorExample = new AssetFloorExample();
         assetFloorExample.setOrderByClause("sort asc");
@@ -109,8 +121,9 @@ public class AssetFloorServiceImpl implements AssetFloorService {
         criteria.andZsztEqualTo("1");
         // 必须为出租状态
         criteria.andSyztEqualTo("2");
+        criteria.andSftjEqualTo("1");
 
-        PageHelper.startPage(1,10);
+        PageHelper.startPage(1,100);
         List<AssetFloor> assetFloors = assetFloorMapper.selectByExample(assetFloorExample);
         assetFloors.stream().forEach(a->{
             List<AssetRoom> byFloorId = assetRoomService.findByFloorId(a.getId());

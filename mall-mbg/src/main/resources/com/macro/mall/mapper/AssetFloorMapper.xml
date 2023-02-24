@@ -11,10 +11,13 @@
     <result column="syzt" jdbcType="VARCHAR" property="syzt" />
     <result column="zszt" jdbcType="VARCHAR" property="zszt" />
     <result column="lbtp" jdbcType="VARCHAR" property="lbtp" />
+    <result column="hometp" jdbcType="VARCHAR" property="hometp" />
     <result column="isfinish" jdbcType="VARCHAR" property="isfinish" />
+    <result column="sftj" jdbcType="VARCHAR" property="sftj" />
     <result column="sort" jdbcType="INTEGER" property="sort" />
     <result column="longitude" jdbcType="VARCHAR" property="longitude" />
-    <result column="Latitude" jdbcType="VARCHAR" property="latitude" />
+    <result column="latitude" jdbcType="VARCHAR" property="latitude" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="price" jdbcType="DECIMAL" property="price" />
     <result column="jzprice" jdbcType="DECIMAL" property="jzprice" />
   </resultMap>
@@ -77,8 +80,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, address, region, lxr, lxdh, syzt, zszt, lbtp, isfinish, sort, longitude, 
-    Latitude, price, jzprice
+    id, name, address, region, lxr, lxdh, syzt, zszt, lbtp,hometp, isfinish,sftj, sort, longitude,
+    latitude,remark, price, jzprice
   </sql>
   <select id="selectByExample" parameterType="com.macro.mall.model.AssetFloorExample" resultMap="BaseResultMap">
     select
@@ -116,13 +119,13 @@
     </selectKey>
     insert into asset_floor (name, address, region, 
       lxr, lxdh, syzt, zszt, 
-      lbtp, isfinish, sort, 
-      longitude, Latitude, price,jzprice
+      lbtp, hometp,isfinish,sftj, sort,
+      longitude, latitude,remark, price,jzprice
       )
     values (#{name,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{region,jdbcType=VARCHAR}, 
       #{lxr,jdbcType=VARCHAR}, #{lxdh,jdbcType=VARCHAR}, #{syzt,jdbcType=VARCHAR}, #{zszt,jdbcType=VARCHAR}, 
-      #{lbtp,jdbcType=VARCHAR}, #{isfinish,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, 
-      #{longitude,jdbcType=VARCHAR}, #{latitude,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{jzprice,jdbcType=DECIMAL}
+      #{lbtp,jdbcType=VARCHAR},#{hometp,jdbcType=VARCHAR}, #{isfinish,jdbcType=VARCHAR},#{sftj,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER},
+      #{longitude,jdbcType=VARCHAR}, #{latitude,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{jzprice,jdbcType=DECIMAL}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.macro.mall.model.AssetFloor">
@@ -155,8 +158,14 @@
       <if test="lbtp != null">
         lbtp,
       </if>
+      <if test="hometp != null">
+        hometp,
+      </if>
       <if test="isfinish != null">
         isfinish,
+      </if>
+      <if test="sftj != null">
+      sftj,
       </if>
       <if test="sort != null">
         sort,
@@ -165,7 +174,10 @@
         longitude,
       </if>
       <if test="latitude != null">
-        Latitude,
+        latitude,
+      </if>
+      <if test="remark != null">
+        remark,
       </if>
       <if test="price != null">
         price,
@@ -199,8 +211,14 @@
       <if test="lbtp != null">
         #{lbtp,jdbcType=VARCHAR},
       </if>
+      <if test="hometp != null">
+        #{hometp,jdbcType=VARCHAR},
+      </if>
       <if test="isfinish != null">
         #{isfinish,jdbcType=VARCHAR},
+      </if>
+      <if test="sftj != null">
+        #{sftj,jdbcType=VARCHAR},
       </if>
       <if test="sort != null">
         #{sort,jdbcType=INTEGER},
@@ -210,6 +228,9 @@
       </if>
       <if test="latitude != null">
         #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
       </if>
       <if test="price != null">
         #{price,jdbcType=DECIMAL},
@@ -255,8 +276,14 @@
       <if test="row.lbtp != null">
         lbtp = #{row.lbtp,jdbcType=VARCHAR},
       </if>
+      <if test="row.hometp != null">
+        hometp = #{row.hometp,jdbcType=VARCHAR},
+      </if>
       <if test="row.isfinish != null">
         isfinish = #{row.isfinish,jdbcType=VARCHAR},
+      </if>
+      <if test="row.sftj != null">
+        sftj = #{row.sftj,jdbcType=VARCHAR},
       </if>
       <if test="row.sort != null">
         sort = #{row.sort,jdbcType=INTEGER},
@@ -265,7 +292,10 @@
         longitude = #{row.longitude,jdbcType=VARCHAR},
       </if>
       <if test="row.latitude != null">
-        Latitude = #{row.latitude,jdbcType=VARCHAR},
+        latitude = #{row.latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="row.remark != null">
+        remark = #{row.remark,jdbcType=VARCHAR},
       </if>
       <if test="row.price != null">
         price = #{row.price,jdbcType=DECIMAL},
@@ -289,10 +319,13 @@
       syzt = #{row.syzt,jdbcType=VARCHAR},
       zszt = #{row.zszt,jdbcType=VARCHAR},
       lbtp = #{row.lbtp,jdbcType=VARCHAR},
+      hometp = #{row.hometp,jdbcType=VARCHAR},
       isfinish = #{row.isfinish,jdbcType=VARCHAR},
+    sftj = #{row.sftj,jdbcType=VARCHAR},
       sort = #{row.sort,jdbcType=INTEGER},
       longitude = #{row.longitude,jdbcType=VARCHAR},
-      Latitude = #{row.latitude,jdbcType=VARCHAR},
+    latitude = #{row.latitude,jdbcType=VARCHAR},
+    remark = #{row.remark,jdbcType=VARCHAR},
       price = #{row.price,jdbcType=DECIMAL},
     jzprice = #{row.jzprice,jdbcType=DECIMAL}
     <if test="example != null">
@@ -326,8 +359,14 @@
       <if test="lbtp != null">
         lbtp = #{lbtp,jdbcType=VARCHAR},
       </if>
+      <if test="hometp != null">
+        hometp = #{hometp,jdbcType=VARCHAR},
+      </if>
       <if test="isfinish != null">
         isfinish = #{isfinish,jdbcType=VARCHAR},
+      </if>
+      <if test="sftj != null">
+        sftj = #{sftj,jdbcType=VARCHAR},
       </if>
       <if test="sort != null">
         sort = #{sort,jdbcType=INTEGER},
@@ -336,7 +375,10 @@
         longitude = #{longitude,jdbcType=VARCHAR},
       </if>
       <if test="latitude != null">
-        Latitude = #{latitude,jdbcType=VARCHAR},
+        latitude = #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
       </if>
       <if test="price != null">
         price = #{price,jdbcType=DECIMAL},
@@ -357,10 +399,13 @@
       syzt = #{syzt,jdbcType=VARCHAR},
       zszt = #{zszt,jdbcType=VARCHAR},
       lbtp = #{lbtp,jdbcType=VARCHAR},
+    hometp = #{hometp,jdbcType=VARCHAR},
       isfinish = #{isfinish,jdbcType=VARCHAR},
+    sftj = #{sftj,jdbcType=VARCHAR},
       sort = #{sort,jdbcType=INTEGER},
       longitude = #{longitude,jdbcType=VARCHAR},
-      Latitude = #{latitude,jdbcType=VARCHAR},
+    latitude = #{latitude,jdbcType=VARCHAR},
+    remark = #{remark,jdbcType=VARCHAR},
       price = #{price,jdbcType=DECIMAL},
     jzprice = #{jzprice,jdbcType=DECIMAL}
     where id = #{id,jdbcType=BIGINT}

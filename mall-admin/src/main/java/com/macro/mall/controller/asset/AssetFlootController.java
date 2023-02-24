@@ -129,4 +129,17 @@ public class AssetFlootController {
             return CommonResult.failed();
         }
     }
+
+    @ApiOperation(value = "更新是否推荐")
+    @RequestMapping(value = "/update/sftjStatus", method = RequestMethod.POST)
+    @ResponseBody
+    public CommonResult sftjStatus(@RequestParam("ids") List<Long> ids,
+                                            @RequestParam("sftj") String sftj) {
+        int count = assetFloorService.updateSftjStatus(ids, sftj);
+        if (count > 0) {
+            return CommonResult.success(count);
+        } else {
+            return CommonResult.failed();
+        }
+    }
 }

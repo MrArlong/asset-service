@@ -50,12 +50,36 @@ public class AssetOrderController {
         }
     }
 
-    @ApiOperation("根据商品id获取商品编辑信息")
+    @ApiOperation("更新订单")
+    @RequestMapping(value = "/updateOrder", method = RequestMethod.POST)
+    @ResponseBody
+    public CommonResult updateOrder(@RequestBody AssetOrderParam assetOrderParam) {
+        int count = assetOrderService.updateOrder(assetOrderParam);
+        if (count > 0) {
+            return CommonResult.success(count);
+        } else {
+            return CommonResult.failed();
+        }
+    }
+
+    @ApiOperation("删除订单")
+    @RequestMapping(value = "/deleteOrder", method = RequestMethod.POST)
+    @ResponseBody
+    public CommonResult deleteOrder(@RequestParam("orderId") Long orderId ) {
+        int count = assetOrderService.deleteOrder(orderId);
+        if (count > 0) {
+            return CommonResult.success(count);
+        } else {
+            return CommonResult.failed();
+        }
+    }
+
+    @ApiOperation("根据订单id获取订单和房间")
     @RequestMapping(value = "/updateInfo/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public CommonResult<PmsProductResult> getUpdateInfo(@PathVariable Long id) {
-        PmsProductResult productResult = assetOrderService.getUpdateInfo(id);
-        return CommonResult.success(productResult);
+    public CommonResult<AssetOrderParam> getUpdateInfo(@PathVariable Long id) {
+        AssetOrderParam updateInfo = assetOrderService.getUpdateInfo(id);
+        return CommonResult.success(updateInfo);
     }
 
     @ApiOperation("更新商品")

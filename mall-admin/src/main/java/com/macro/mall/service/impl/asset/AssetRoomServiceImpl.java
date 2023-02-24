@@ -38,7 +38,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
     @Autowired
     private AssetOrderService assetOrderService;
     @Autowired
-    private AssetFloorService assetFloorService;
+    private AssetFloorMapper assetFloorMapper;
     @Autowired
     private PmsProductVertifyRecordDao productVertifyRecordDao;
 
@@ -70,16 +70,16 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         }
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
         assetRooms.stream().forEach(a -> {
-            AssetFloor brand = assetFloorService.getBrand(a.getFloorId());
+            AssetFloor brand = assetFloorMapper.selectByPrimaryKey(a.getFloorId());
             if(Objects.nonNull(brand)){
                 a.setFloorName(brand.getName());
             }
-         /*   List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
+            List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
             if(CollUtil.isEmpty(assetOrderRooms)) {
                 a.setIsOccupancy("0");
             }else {
                 a.setIsOccupancy("1");
-            }*/
+            }
         });
         return assetRooms;
     }
@@ -251,12 +251,12 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
         assetRooms.stream().forEach(a -> {
-          /*  List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
+            List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
             if(CollUtil.isEmpty(assetOrderRooms)) {
                 a.setIsOccupancy("0");
             }else {
                 a.setIsOccupancy("1");
-            }*/
+            }
         });
 
         return assetRooms;

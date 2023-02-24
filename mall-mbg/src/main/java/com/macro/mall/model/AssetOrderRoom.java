@@ -26,8 +26,11 @@ public class AssetOrderRoom implements Serializable {
     @ApiModelProperty(value = "租赁结束时间")
     private Date endTime;
 
-    @ApiModelProperty(value = "租赁单价")
+    @ApiModelProperty(value = "租赁总价")
     private BigDecimal price;
+
+    @ApiModelProperty(value = "租赁单价")
+    private String unitprice;
 
     private static final long serialVersionUID = 1L;
 
@@ -85,6 +88,14 @@ public class AssetOrderRoom implements Serializable {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getUnitprice() {
+        return unitprice;
+    }
+
+    public void setUnitprice(String unitprice) {
+        this.unitprice = unitprice;
     }
 
     @Override

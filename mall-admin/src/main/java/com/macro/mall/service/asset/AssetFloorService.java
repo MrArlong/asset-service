@@ -57,6 +57,8 @@ public interface AssetFloorService {
      */
     int updateFactoryStatus(List<Long> ids, String zszt);
 
+    int updateSftjStatus(List<Long> ids, String sftj);
+
     List<AssetFloor> wxHostFloorList();
 
     List<AssetFloor> floorListAll(String syzt);

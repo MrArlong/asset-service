@@ -14,6 +14,9 @@ public class AssetOrderRoomDto  {
     @ApiModelProperty(value = "订单id")
     private Long orderId;
 
+    @ApiModelProperty(value = "资产id")
+    private Long floorId;
+
     @ApiModelProperty(value = "资产")
     private String floorName;
 
@@ -23,6 +26,9 @@ public class AssetOrderRoomDto  {
     @ApiModelProperty(value = "房间")
     private String roomNum;
 
+    @ApiModelProperty(value = "房间id")
+    private Long roomId;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty(value = "租赁开始时间")
     private Date beginTime;
@@ -31,8 +37,10 @@ public class AssetOrderRoomDto  {
     @ApiModelProperty(value = "租赁结束时间")
     private Date endTime;
 
-    @ApiModelProperty(value = "租赁单价")
+    @ApiModelProperty(value = "租赁总价")
     private BigDecimal price;
+    @ApiModelProperty(value = "租赁单价")
+    private String unitprice;
 
     private static final long serialVersionUID = 1L;
 }

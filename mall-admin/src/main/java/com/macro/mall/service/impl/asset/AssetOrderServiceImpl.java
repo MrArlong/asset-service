@@ -47,8 +47,6 @@ public class AssetOrderServiceImpl implements AssetOrderService {
     @Autowired
     private PmsSkuStockMapper skuStockMapper;
     @Autowired
-    private PmsProductDao productDao;
-    @Autowired
     private PmsProductVertifyRecordDao productVertifyRecordDao;
 
     @Override
@@ -63,6 +61,45 @@ public class AssetOrderServiceImpl implements AssetOrderService {
             assetOrderRoom.setOrderId(assetOrder.getId());
             assetOrderRoomMapper.insertSelective(assetOrderRoom);
         }
+        return 1;
+    }
+
+    @Override
+    public int updateOrder(AssetOrderParam assetOrderParam) {
+
+        AssetOrder assetOrder = new AssetOrder();
+        BeanUtils.copyProperties(assetOrderParam, assetOrder);
+        assetOrder.setId(assetOrderParam.getId());
+         assetOrderMapper.updateByPrimaryKeySelective(assetOrder);
+
+        AssetOrderRoomExample assetRoomExample = new AssetOrderRoomExample();
+        AssetOrderRoomExample.Criteria criteria = assetRoomExample.createCriteria();
+        criteria.andOrderIdEqualTo(assetOrderParam.getId());
+        assetOrderRoomMapper.deleteByExample(assetRoomExample);
+
+        List<AssetOrderRoomParam> orderRoom = assetOrderParam.getOrderRoom();
+        for(AssetOrderRoomParam room: orderRoom) {
+            AssetOrderRoom assetOrderRoom = new AssetOrderRoom();
+            BeanUtils.copyProperties(room,assetOrderRoom);
+            assetOrderRoom.setOrderId(assetOrder.getId());
+            assetOrderRoomMapper.insertSelective(assetOrderRoom);
+        }
+        return 1;
+    }
+
+
+    @Override
+    public int deleteOrder(Long orderId) {
+        AssetOrderExample assetExample = new AssetOrderExample();
+        AssetOrderExample.Criteria criteria = assetExample.createCriteria();
+        criteria.andIdEqualTo(orderId);
+        assetOrderMapper.deleteByExample(assetExample);
+
+        AssetOrderRoomExample assetRoomExample = new AssetOrderRoomExample();
+        AssetOrderRoomExample.Criteria criteria1 = assetRoomExample.createCriteria();
+        criteria1.andOrderIdEqualTo(orderId);
+        assetOrderRoomMapper.deleteByExample(assetRoomExample);
+
         return 1;
     }
 
@@ -85,8 +122,8 @@ public class AssetOrderServiceImpl implements AssetOrderService {
     }
 
     @Override
-    public PmsProductResult getUpdateInfo(Long id) {
-        return productDao.getUpdateInfo(id);
+    public AssetOrderParam getUpdateInfo(Long id) {
+        return null;
     }
 
     @Override
@@ -324,6 +361,7 @@ public class AssetOrderServiceImpl implements AssetOrderService {
 
     }
 
+    @Override
     public List<AssetOrderRoom> orderRoomms(Long roomId){
         AssetOrderRoomExample room = new AssetOrderRoomExample();
         AssetOrderRoomExample.Criteria roomCriteria = room.createCriteria();

@@ -20,10 +20,16 @@ public interface AssetOrderService {
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     int create(AssetOrderParam assetOrderParam);
 
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    int updateOrder(AssetOrderParam assetOrderParam);
+
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    int deleteOrder(Long orderId);
+
     /**
      * 根据商品编号获取更新信息
      */
-    PmsProductResult getUpdateInfo(Long id);
+    AssetOrderParam getUpdateInfo(Long id);
 
     /**
      * 更新商品

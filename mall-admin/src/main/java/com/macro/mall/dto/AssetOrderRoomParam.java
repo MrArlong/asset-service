@@ -37,4 +37,7 @@ public class AssetOrderRoomParam {
     @ApiModelProperty(value = "租赁单价")
     private BigDecimal price;
 
+    @ApiModelProperty(value = "租赁单价")
+    private String unitprice;
+
 }

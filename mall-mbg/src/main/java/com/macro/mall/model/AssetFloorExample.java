@@ -740,6 +740,11 @@ public class AssetFloorExample {
             return (Criteria) this;
         }
 
+        public Criteria andSftjEqualTo(String value) {
+            addCriterion("sftj =", value, "sftj");
+            return (Criteria) this;
+        }
+
         public Criteria andIsfinishNotEqualTo(String value) {
             addCriterion("isfinish <>", value, "isfinish");
             return (Criteria) this;

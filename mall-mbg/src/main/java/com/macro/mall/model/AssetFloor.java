@@ -31,6 +31,9 @@ public class AssetFloor implements Serializable {
     @ApiModelProperty(value = "轮播图片")
     private String lbtp;
 
+    @ApiModelProperty(value = "首页图片")
+    private String hometp;
+
     @ApiModelProperty(value = "是否完工（1是0否）")
     private String isfinish;
 
@@ -48,6 +51,12 @@ public class AssetFloor implements Serializable {
 
     @ApiModelProperty(value = "精装价格")
     private BigDecimal jzprice;
+
+    @ApiModelProperty(value = "简介")
+    private String remark;
+
+    @ApiModelProperty(value = "是否热门推荐")
+    private String sftj;
 
     @ApiModelProperty(value = "总数")
     private Integer sum;
@@ -96,6 +105,21 @@ public class AssetFloor implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getSftj() {
+        return sftj;
+    }
+
+    public void setSftj(String sftj) {
+        this.sftj = sftj;
     }
 
     public String getAddress() {
@@ -152,6 +176,14 @@ public class AssetFloor implements Serializable {
 
     public void setLbtp(String lbtp) {
         this.lbtp = lbtp;
+    }
+
+    public String getHometp() {
+        return hometp;
+    }
+
+    public void setHometp(String hometp) {
+        this.hometp = hometp;
     }
 
     public String getIsfinish() {
