@@ -31,6 +31,10 @@ public class AssetOrder implements Serializable {
     @ApiModelProperty(value = "支付时间")
     private Date zfsj;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @ApiModelProperty(value = "创建时间")
+    private Date createtime;
+
     @ApiModelProperty(value = "支付方式")
     private String zffs;
 
@@ -101,6 +105,13 @@ public class AssetOrder implements Serializable {
 
     public void setZfsj(Date zfsj) {
         this.zfsj = zfsj;
+    }
+    public Date getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(Date createtime) {
+        this.createtime = createtime;
     }
 
     public String getZffs() {

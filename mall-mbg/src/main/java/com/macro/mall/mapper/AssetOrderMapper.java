@@ -3,6 +3,8 @@ package com.macro.mall.mapper;
 import com.macro.mall.model.AssetOrder;
 import com.macro.mall.model.AssetOrderExample;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface AssetOrderMapper {
@@ -29,4 +31,5 @@ public interface AssetOrderMapper {
     int updateByPrimaryKey(AssetOrder row);
 
 
+    List<Map<String, Object>> selectOrderTj(AssetOrderExample assetOrderExample);
 }

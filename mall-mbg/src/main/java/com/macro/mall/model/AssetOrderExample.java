@@ -609,9 +609,17 @@ public class AssetOrderExample {
             addCriterion("zfsj >", value, "zfsj");
             return (Criteria) this;
         }
+        public Criteria andCreatetimeGreaterThan(Date value) {
+            addCriterion("createtime >", value, "createtime");
+            return (Criteria) this;
+        }
 
         public Criteria andZfsjGreaterThanOrEqualTo(Date value) {
             addCriterion("zfsj >=", value, "zfsj");
+            return (Criteria) this;
+        }
+        public Criteria andCreatetimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("createtime >=", value, "createtime");
             return (Criteria) this;
         }
 
@@ -619,9 +627,17 @@ public class AssetOrderExample {
             addCriterion("zfsj <", value, "zfsj");
             return (Criteria) this;
         }
+        public Criteria andCreatetimeLessThan(Date value) {
+            addCriterion("createtime <", value, "createtime");
+            return (Criteria) this;
+        }
 
         public Criteria andZfsjLessThanOrEqualTo(Date value) {
             addCriterion("zfsj <=", value, "zfsj");
+            return (Criteria) this;
+        }
+        public Criteria andCreatetimeLessThanOrEqualTo(Date value) {
+            addCriterion("createtime <=", value, "createtime");
             return (Criteria) this;
         }
 
@@ -637,6 +653,10 @@ public class AssetOrderExample {
 
         public Criteria andZfsjBetween(Date value1, Date value2) {
             addCriterion("zfsj between", value1, value2, "zfsj");
+            return (Criteria) this;
+        }
+        public Criteria andCreatetimeBetween(Date value1, Date value2) {
+            addCriterion("createtime between", value1, value2, "createtime");
             return (Criteria) this;
         }
 

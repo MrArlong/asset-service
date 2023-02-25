@@ -1,6 +1,7 @@
 package com.macro.mall.service.impl.asset;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +37,8 @@ public class AssetRoomServiceImpl implements AssetRoomService {
     private AssetRoomMapper assetRoomMapper;
     @Autowired
     private AssetOrderRoomMapper assetOrderRoomMapper;
+    @Autowired
+    private AssetOrderMapper assetOrderMapper;
     @Autowired
     private AssetOrderService assetOrderService;
     @Autowired
@@ -262,5 +266,93 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         return assetRooms;
     }
 
+    @Override
+    public Map<String, Object> homeRoomSum() {
+        AssetRoomExample assetRoomExample = new AssetRoomExample();
+        AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
+        criteria.andZsztEqualTo("1");
 
+        List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
+
+        Map<String,Object>map=new HashMap<>();
+        map.put("sum", assetRooms.size());
+        // 下架
+        long below = assetRooms.stream().filter(a -> a.getZszt().equals("0")).count();
+        map.put("below",below);
+        // 上架
+        long up = assetRooms.stream().filter(a -> a.getZszt().equals("1")).count();
+        map.put("up",up);
+
+        List<Long> collect = assetRooms.stream().map(AssetRoom::getId).collect(Collectors.toList());
+        List<AssetOrderRoom> assetOrderRooms1 = assetOrderService.orderRoommsList(collect);
+        map.put("cz",assetOrderRooms1.size());
+
+
+        // 今日新增
+        AssetOrderExample assetOrderExample = new AssetOrderExample();
+        AssetOrderExample.Criteria assetOrderExampleCriteria = assetOrderExample.createCriteria();
+        DateTime dateTime = DateUtil.parseDate(DateUtil.today());
+
+        assetOrderExampleCriteria.andCreatetimeGreaterThanOrEqualTo(dateTime);
+        assetOrderExampleCriteria.andCreatetimeLessThan(DateUtil.offsetDay(dateTime,1));
+        List<AssetOrder> assetOrderRooms = assetOrderMapper.selectByExample(assetOrderExample);
+        int size = assetOrderRooms.size();
+        map.put("jrxz",size);
+
+        // 昨日新增
+        AssetOrderExample a2 = new AssetOrderExample();
+        AssetOrderExample.Criteria aa2 = a2.createCriteria();
+        aa2.andCreatetimeGreaterThanOrEqualTo(DateUtil.offsetDay(dateTime,-1));
+        aa2.andCreatetimeLessThan(dateTime);
+        List<AssetOrder> zrxzs = assetOrderMapper.selectByExample(a2);
+        map.put("zrxz",zrxzs.size());
+
+        // 本月新增
+        AssetOrderExample a3 = new AssetOrderExample();
+        AssetOrderExample.Criteria aa3 = a3.createCriteria();
+        String format = DateUtil.format(new DateTime(), "yyyy-MM");
+        String bengin=format+"-01";
+        String end=format+"-31";
+        aa3.andCreatetimeGreaterThanOrEqualTo(DateUtil.parse(bengin));
+        aa3.andCreatetimeLessThan(DateUtil.parse(end));
+        List<AssetOrder> byxzs = assetOrderMapper.selectByExample(a3);
+        map.put("byxz",byxzs.size());
+        BigDecimal bydde=new BigDecimal(0.00);
+        for(AssetOrder a:byxzs) {
+            bydde=bydde.add(a.getZje());
+        }
+        map.put("bydde",bydde);
+
+        // 总数
+        List<AssetOrder> zss = assetOrderMapper.selectByExample(new AssetOrderExample());
+        map.put("zs",zss.size());
+
+
+        // 本周新增
+        AssetOrderExample a4 = new AssetOrderExample();
+        AssetOrderExample.Criteria aa4 = a4.createCriteria();
+        Date weekStart = DateUtil.beginOfWeek(new DateTime());
+        DateTime weekEnd = DateUtil.offsetDay(weekStart, 7);
+        aa4.andCreatetimeGreaterThanOrEqualTo(weekStart);
+        aa4.andCreatetimeLessThan(weekEnd);
+        List<AssetOrder> bzxz = assetOrderMapper.selectByExample(a4);
+        map.put("bzxz",bzxz.size());
+        BigDecimal bzdde=new BigDecimal(0.00);
+        for(AssetOrder a:bzxz) {
+            bzdde=bzdde.add(a.getZje());
+        }
+        map.put("bzdde",bzdde);
+        return map;
+    }
+
+    @Override
+    public List<Map<String, Object>> orderTj(Date beginTime, Date endTime) {
+
+        AssetOrderExample assetOrderExample = new AssetOrderExample();
+        AssetOrderExample.Criteria assetOrderExampleCriteria = assetOrderExample.createCriteria();
+        assetOrderExampleCriteria.andCreatetimeGreaterThanOrEqualTo(beginTime);
+        assetOrderExampleCriteria.andCreatetimeLessThan(DateUtil.offsetDay(endTime,1));
+        List<Map<String,Object>> assetOrderRooms = assetOrderMapper.selectOrderTj(assetOrderExample);
+        return assetOrderRooms;
+    }
 }

@@ -102,4 +102,5 @@ public interface AssetOrderService {
     int updateIsOccupancy(List<Long> ids);
 
     List<AssetOrderRoom> orderRoomms(Long roomId);
+    List<AssetOrderRoom> orderRoommsList(List<Long> roomId);
 }

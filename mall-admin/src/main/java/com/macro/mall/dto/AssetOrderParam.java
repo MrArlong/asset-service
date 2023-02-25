@@ -42,6 +42,10 @@ public class AssetOrderParam {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date zfsj;
 
+    @ApiModelProperty(value = "创建时间")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date createTime;
+
     @ApiModelProperty(value = "支付方式")
     private String zffs;
 

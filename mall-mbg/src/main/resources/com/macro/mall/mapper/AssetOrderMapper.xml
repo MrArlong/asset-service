@@ -10,6 +10,7 @@
     <result column="zlr" jdbcType="VARCHAR" property="zlr" />
     <result column="zlrlxdh" jdbcType="VARCHAR" property="zlrlxdh" />
     <result column="zfsj" jdbcType="TIMESTAMP" property="zfsj" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
     <result column="zffs" jdbcType="VARCHAR" property="zffs" />
     <result column="zje" jdbcType="DECIMAL" property="zje" />
   </resultMap>
@@ -72,7 +73,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, order_num, order_type, czr, czrlxdh, zlr, zlrlxdh, zfsj, zffs, zje
+    id, order_num, order_type, czr, czrlxdh, zlr, zlrlxdh, zfsj,createtime, zffs, zje
   </sql>
   <select id="selectByExample" parameterType="com.macro.mall.model.AssetOrderExample" resultMap="BaseResultMap">
     select
@@ -110,10 +111,10 @@
     </selectKey>
     insert into asset_order (order_num, order_type, czr, 
       czrlxdh, zlr, zlrlxdh, 
-      zfsj, zffs, zje)
+      zfsj,createtime, zffs, zje)
     values (#{orderNum,jdbcType=VARCHAR}, #{orderType,jdbcType=VARCHAR}, #{czr,jdbcType=VARCHAR}, 
       #{czrlxdh,jdbcType=VARCHAR}, #{zlr,jdbcType=VARCHAR}, #{zlrlxdh,jdbcType=VARCHAR}, 
-      #{zfsj,jdbcType=TIMESTAMP}, #{zffs,jdbcType=VARCHAR}, #{zje,jdbcType=DECIMAL})
+      #{zfsj,jdbcType=TIMESTAMP},#{createtime,jdbcType=TIMESTAMP}, #{zffs,jdbcType=VARCHAR}, #{zje,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective"  parameterType="com.macro.mall.model.AssetOrder">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -141,6 +142,9 @@
       </if>
       <if test="zfsj != null">
         zfsj,
+      </if>
+      <if test="createtime != null">
+        createtime,
       </if>
       <if test="zffs != null">
         zffs,
@@ -170,6 +174,9 @@
       </if>
       <if test="zfsj != null">
         #{zfsj,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
       </if>
       <if test="zffs != null">
         #{zffs,jdbcType=VARCHAR},
@@ -212,6 +219,9 @@
       <if test="row.zfsj != null">
         zfsj = #{row.zfsj,jdbcType=TIMESTAMP},
       </if>
+      <if test="row.createtime != null">
+        createtime = #{row.createtime,jdbcType=TIMESTAMP},
+      </if>
       <if test="row.zffs != null">
         zffs = #{row.zffs,jdbcType=VARCHAR},
       </if>
@@ -233,6 +243,7 @@
       zlr = #{row.zlr,jdbcType=VARCHAR},
       zlrlxdh = #{row.zlrlxdh,jdbcType=VARCHAR},
       zfsj = #{row.zfsj,jdbcType=TIMESTAMP},
+    createtime = #{row.createtime,jdbcType=TIMESTAMP},
       zffs = #{row.zffs,jdbcType=VARCHAR},
       zje = #{row.zje,jdbcType=DECIMAL}
     <if test="example != null">
@@ -263,6 +274,9 @@
       <if test="zfsj != null">
         zfsj = #{zfsj,jdbcType=TIMESTAMP},
       </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
       <if test="zffs != null">
         zffs = #{zffs,jdbcType=VARCHAR},
       </if>
@@ -281,8 +295,21 @@
       zlr = #{zlr,jdbcType=VARCHAR},
       zlrlxdh = #{zlrlxdh,jdbcType=VARCHAR},
       zfsj = #{zfsj,jdbcType=TIMESTAMP},
+    createtime = #{createtime,jdbcType=TIMESTAMP},
       zffs = #{zffs,jdbcType=VARCHAR},
       zje = #{zje,jdbcType=DECIMAL}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectOrderTj" parameterType="com.macro.mall.model.AssetOrderExample" resultType="map">
+    select
+    DATE_FORMAT(createtime,'%Y-%m-%d') as date,
+    count(id) as orderCount,
+    sum(zje)as orderAmount
+    from asset_order
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    group by createtime
+  </select>
 </mapper>

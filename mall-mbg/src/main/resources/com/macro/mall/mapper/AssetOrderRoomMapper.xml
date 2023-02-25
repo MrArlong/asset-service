@@ -322,5 +322,16 @@
     set is_occupancy='0'
   </update>
 
+  <select id="selectOrderTj" parameterType="com.macro.mall.model.AssetOrderRoomExample" resultType="map">
+    select
+    DATE_FORMAT(begin_time,'%Y-%m-%d') as date,
+    count(id) as orderCount,
+    sum(price)as orderAmount
+    from asset_order_room
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+   group by begin_time
+  </select>
 
 </mapper>

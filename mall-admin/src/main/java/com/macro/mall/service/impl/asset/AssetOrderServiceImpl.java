@@ -54,6 +54,7 @@ public class AssetOrderServiceImpl implements AssetOrderService {
         AssetOrder assetOrder = new AssetOrder();
         BeanUtils.copyProperties(assetOrderParam, assetOrder);
         List<AssetOrderRoomParam> orderRoom = assetOrderParam.getOrderRoom();
+        assetOrder.setCreatetime(new Date());
         int i = assetOrderMapper.insertSelective(assetOrder);
         for(AssetOrderRoomParam room: orderRoom) {
             AssetOrderRoom assetOrderRoom = new AssetOrderRoom();
@@ -366,6 +367,15 @@ public class AssetOrderServiceImpl implements AssetOrderService {
         AssetOrderRoomExample room = new AssetOrderRoomExample();
         AssetOrderRoomExample.Criteria roomCriteria = room.createCriteria();
         roomCriteria.andRoomIdEqualTo(roomId);
+        roomCriteria.andEndTimeGreaterThan(new Date());
+        List<AssetOrderRoom> assetOrderRooms = assetOrderRoomMapper.selectByExample(room);
+        return assetOrderRooms;
+    }
+    @Override
+    public List<AssetOrderRoom> orderRoommsList(List<Long> roomId){
+        AssetOrderRoomExample room = new AssetOrderRoomExample();
+        AssetOrderRoomExample.Criteria roomCriteria = room.createCriteria();
+        roomCriteria.andRoomIdIn(roomId);
         roomCriteria.andEndTimeGreaterThan(new Date());
         List<AssetOrderRoom> assetOrderRooms = assetOrderRoomMapper.selectByExample(room);
         return assetOrderRooms;

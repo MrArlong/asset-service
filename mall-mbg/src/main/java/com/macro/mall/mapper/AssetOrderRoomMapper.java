@@ -6,6 +6,8 @@ import com.macro.mall.model.AssetOrderRoomExample;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface AssetOrderRoomMapper {
@@ -35,5 +37,7 @@ public interface AssetOrderRoomMapper {
     List<AssetOrderRoomDto> selectByLqtx(AssetOrderRoomExample example);
 
     int updateAll();
+
+    List<Map<String,Object>> selectOrderTj(AssetOrderRoomExample example);
 
 }

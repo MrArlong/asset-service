@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -192,5 +194,21 @@ public class AssetRoomController {
         } else {
             return CommonResult.failed();
         }
+    }
+
+    @ApiOperation("首页房间总览")
+    @RequestMapping(value = "/homeRoomSum", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult<Map<String,Object>> homeRoomSum() {
+        Map<String,Object>assetRooms = assetRoomService.homeRoomSum();
+        return CommonResult.success(assetRooms);
+    }
+
+    @ApiOperation("订单统计")
+    @RequestMapping(value = "/orderTj", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult<List<Map<String,Object>>> orderTj(Date beginTime, Date endTime) {
+        List<Map<String,Object>>assetRooms = assetRoomService.orderTj(beginTime,endTime);
+        return CommonResult.success(assetRooms);
     }
 }

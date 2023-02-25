@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -87,4 +89,8 @@ public interface AssetRoomService {
     List<AssetRoom> getFj(Long floorId,String floor);
 
     List<AssetRoom> findByFloorId(Long floorId);
+
+    Map<String, Object> homeRoomSum();
+
+    List<Map<String, Object>> orderTj(Date beginTime, Date endTime);
 }
