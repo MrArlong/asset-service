@@ -3,8 +3,7 @@ package com.macro.mall.service.impl.asset;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.macro.mall.dto.AssetFloorParam;
-import com.macro.mall.mapper.AssetRoomMapper;
-import com.macro.mall.mapper.PmsProductMapper;
+import com.macro.mall.mapper.AssetGgimgMapper;
 import com.macro.mall.mapper.AssetFloorMapper;
 import com.macro.mall.model.*;
 import com.macro.mall.service.asset.AssetFloorService;
@@ -14,8 +13,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * 商品品牌管理Service实现类
@@ -27,6 +27,8 @@ public class AssetFloorServiceImpl implements AssetFloorService {
     private AssetFloorMapper assetFloorMapper;
     @Autowired
     private AssetRoomService assetRoomService;
+    @Autowired
+    private AssetGgimgMapper assetGgimgMapper;
 
     @Override
     public List<AssetFloor> listAllBrand() {
@@ -154,5 +156,34 @@ public class AssetFloorServiceImpl implements AssetFloorService {
             a.setTotalLet(new Long(totalLet).intValue());
         });
         return assetFloors;
+    }
+
+    @Override
+    public Map<String, Object> getHometpAndGgtp() {
+        AssetGgimgExample ggimgExample = new AssetGgimgExample();
+        AssetGgimgExample.Criteria criteria = ggimgExample.createCriteria();
+            criteria.andZsztEqualTo("1");
+        List<AssetGgimg> assetGgimgs = assetGgimgMapper.selectByExample(ggimgExample);
+        Map<String,Object>map=new HashMap<>();
+        String hometp="";
+        String ggtp="";
+        for(AssetGgimg a:assetGgimgs) {
+            if(StrUtil.isNotBlank(a.getHometp())){
+                if(StrUtil.isNotBlank(hometp)){
+                    hometp=hometp+",";
+                }
+                hometp=hometp+a.getHometp();
+            }
+            if(StrUtil.isNotBlank(a.getLbtp())){
+                if(StrUtil.isNotBlank(ggtp)){
+                    ggtp=ggtp+",";
+                }
+                ggtp=ggtp+a.getLbtp();
+            }
+        }
+
+        map.put("hometp",hometp);
+        map.put("ggtp",ggtp);
+        return  map;
     }
 }

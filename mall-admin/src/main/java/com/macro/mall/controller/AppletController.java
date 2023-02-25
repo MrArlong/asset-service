@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -52,5 +53,12 @@ public class AppletController {
     @ResponseBody
     public CommonResult<AssetFloor> getItem(@RequestParam("id") Long id) {
         return CommonResult.success(assetFloorService.getBrand(id));
+    }
+
+    @ApiOperation(value = "查询首页轮播图和广告")
+    @RequestMapping(value = "/getHometpAndGgtp", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult<Map<String,Object>> getHometpAndGgtp() {
+        return CommonResult.success(assetFloorService.getHometpAndGgtp());
     }
 }
