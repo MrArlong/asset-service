@@ -1,22 +1,19 @@
 package com.macro.mall.service.impl.asset;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.macro.mall.dto.AssetGgimgParam;
 import com.macro.mall.mapper.AssetGgimgMapper;
-import com.macro.mall.mapper.AssetGgimgMapper;
 import com.macro.mall.model.AssetGgimg;
 import com.macro.mall.model.AssetGgimgExample;
-import com.macro.mall.model.AssetRoom;
 import com.macro.mall.service.asset.AssetGgimgService;
-import com.macro.mall.service.asset.AssetGgimgService;
-import com.macro.mall.service.asset.AssetRoomService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 商品品牌管理Service实现类
@@ -93,6 +90,21 @@ public class AssetGgimgServiceImpl implements AssetGgimgService {
 
     @Override
     public int updateFactoryStatus(List<Long> ids, String zszt) {
+        AssetGgimgExample example = new AssetGgimgExample();
+        AssetGgimgExample.Criteria criteria = example.createCriteria();
+            criteria.andZsztEqualTo("1");
+        List<AssetGgimg> assetGgimgs = AssetGgimgMapper.selectByExample(example);
+        if(CollUtil.isNotEmpty(assetGgimgs)){
+            if(zszt.equals("1")){
+                AssetGgimg assetGgimg = new AssetGgimg();
+                assetGgimg.setZszt("0");
+                AssetGgimgExample AssetGgimgExample = new AssetGgimgExample();
+                List<Long> collect = assetGgimgs.stream().map(AssetGgimg::getId).collect(Collectors.toList());
+                AssetGgimgExample.createCriteria().andIdIn(collect);
+                 AssetGgimgMapper.updateByExampleSelective(assetGgimg, AssetGgimgExample);
+            }
+        }
+
         AssetGgimg AssetGgimg = new AssetGgimg();
         AssetGgimg.setZszt(zszt);
         AssetGgimgExample AssetGgimgExample = new AssetGgimgExample();
