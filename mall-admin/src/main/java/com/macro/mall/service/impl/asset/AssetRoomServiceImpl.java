@@ -292,9 +292,13 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         long up = assetRooms.stream().filter(a -> a.getZszt().equals("1")).count();
         map.put("up",up);
 
+        List<Long> collect1 = assetRooms.stream().filter(a -> a.getIsOccupancy().equals("1")).map(AssetRoom::getId).collect(Collectors.toList());
         List<Long> collect = assetRooms.stream().map(AssetRoom::getId).collect(Collectors.toList());
         List<AssetOrderRoom> assetOrderRooms1 = assetOrderService.orderRoommsList(collect);
-        map.put("cz",assetOrderRooms1.size());
+
+        List<Long> collect2 = assetOrderRooms1.stream().map(AssetOrderRoom::getRoomId).collect(Collectors.toList());
+        Set<Long> longs = CollUtil.unionDistinct(collect1, collect2);
+        map.put("cz",longs.size());
 
 
         // 今日新增
