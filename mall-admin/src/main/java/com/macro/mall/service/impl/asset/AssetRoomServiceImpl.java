@@ -3,26 +3,30 @@ package com.macro.mall.service.impl.asset;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.macro.mall.dao.*;
 import com.macro.mall.dto.*;
 import com.macro.mall.mapper.*;
 import com.macro.mall.model.*;
-import com.macro.mall.service.asset.AssetFloorService;
 import com.macro.mall.service.asset.AssetOrderService;
 import com.macro.mall.service.asset.AssetRoomService;
+import com.macro.mall.utils.FileUtil;
+import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,11 +82,14 @@ public class AssetRoomServiceImpl implements AssetRoomService {
             if(Objects.nonNull(brand)){
                 a.setFloorName(brand.getName());
             }
-            List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
-            if(CollUtil.isEmpty(assetOrderRooms)) {
-                a.setIsOccupancy("0");
-            }else {
-                a.setIsOccupancy("1");
+            // 如果数据库状态是已出租，那就按照数据库的已出租来，如果数据库状态是未出租，就按照订单来
+            if(a.getIsOccupancy().equals("0")){
+                List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
+                if(CollUtil.isEmpty(assetOrderRooms)) {
+                    a.setIsOccupancy("0");
+                }else {
+                    a.setIsOccupancy("1");
+                }
             }
         });
         return assetRooms;
@@ -255,11 +262,13 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
         assetRooms.stream().forEach(a -> {
-            List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
-            if(CollUtil.isEmpty(assetOrderRooms)) {
-                a.setIsOccupancy("0");
-            }else {
-                a.setIsOccupancy("1");
+                if(a.getIsOccupancy().equals("0")){
+                List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
+                if(CollUtil.isEmpty(assetOrderRooms)) {
+                    a.setIsOccupancy("0");
+                }else {
+                    a.setIsOccupancy("1");
+                }
             }
         });
 
@@ -355,4 +364,85 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         List<Map<String,Object>> assetOrderRooms = assetOrderMapper.selectOrderTj(assetOrderExample);
         return assetOrderRooms;
     }
+
+@Override
+    public void downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response) throws Exception {
+        List<Map<String, Object>> responseList = new ArrayList<>();
+
+        AssetRoomExample assetRoomExample = new AssetRoomExample();
+        AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
+        if(assetRoomParam.getFloorId()!=null){
+            criteria.andFloorIdEqualTo(assetRoomParam.getFloorId());
+        }
+        List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
+
+        assetRooms.forEach(item -> {
+                Map<String, Object> map = new HashMap<>();
+                AssetFloor assetFloor = assetFloorMapper.selectByPrimaryKey(item.getFloorId());
+                map.put("资产名称", assetFloor.getName());
+                map.put("资产id", item.getFloorId());
+                map.put("楼层号", item.getFloorNum());
+                map.put("房间号", item.getRoomNum());
+                map.put("面积", item.getAcreage());
+                map.put("装修", item.getDecorationType());
+                map.put("展示状态（0下架1上架）", item.getZszt());
+                responseList.add(map);
+            });
+
+        FileUtil.downloadExcel(responseList, response);
+    }
+
+
+    public ResponseEntity<Object> importExecl(MultipartFile file) throws Exception {
+
+        //读取工作簿
+        Workbook workBook = WorkbookFactory.create(file.getInputStream());
+        //读取工作表
+        Sheet sheet = workBook.getSheetAt(0);
+        //总行数
+        int rowNumber = sheet.getPhysicalNumberOfRows();
+        //总列数
+        Row titleRow = sheet.getRow(0);
+        int colNum = titleRow.getPhysicalNumberOfCells();
+
+        //校验是否填写内容
+        if (rowNumber <= 1) {
+            return new ResponseEntity("文件无内容", HttpStatus.BAD_REQUEST);
+        }
+        //循环读取每一行数据并校验
+        for (int i = 1; i < rowNumber; i++) {
+            try {
+                //读取行
+                Row row = sheet.getRow(i);
+                //读取单元格
+                AssetRoom salary = new AssetRoom();
+                JSONObject resultJson = new JSONObject(true);
+
+                for (int m = 0; m < colNum; m++) {
+                    if(titleRow.getCell(m) != null) {
+                        titleRow.getCell(m).setCellType(CellType.STRING);
+                    }else {
+                        throw new Exception("第" + (i + 1) + "列表头不能为空");
+                    }
+
+                    if(row.getCell(m) != null) {
+                        row.getCell(m).setCellType(CellType.STRING);
+                    }else {
+                        resultJson.put(titleRow.getCell(m).getStringCellValue(), row.getCell(m));
+                        continue;
+                    }
+                    if(!"{}".equals(resultJson.toJSONString())) {
+                        salary.setFloorName(resultJson.toJSONString());
+                        assetRoomMapper.insert(salary);
+                    }
+                }
+            } catch (Exception e) {
+                throw new Exception("第" + (i + 1) + "行数据有错误," + e.getMessage());
+            }
+        }
+        workBook.close();
+        return null;
+    }
+
+
 }

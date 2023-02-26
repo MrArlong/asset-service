@@ -1,17 +1,15 @@
 package com.macro.mall.service.asset;
 
 import com.macro.mall.dto.*;
-import com.macro.mall.model.AssetFloor;
 import com.macro.mall.model.AssetRoom;
-import com.macro.mall.model.PmsProduct;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 房间管理Service
@@ -93,4 +91,6 @@ public interface AssetRoomService {
     Map<String, Object> homeRoomSum();
 
     List<Map<String, Object>> orderTj(Date beginTime, Date endTime);
+
+    void downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response) throws Exception;
 }

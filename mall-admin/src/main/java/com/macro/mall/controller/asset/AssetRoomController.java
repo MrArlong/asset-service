@@ -10,10 +10,14 @@ import com.macro.mall.service.asset.AssetRoomService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +27,7 @@ import java.util.Set;
  * 房间管理Controller
  * Created by macro on 2018/4/26.
  */
-@Controller
+@RestController
 @Api(tags = "AssetRoomController")
 @Tag(name = "AssetRoomController", description = "房间管理")
 @RequestMapping("/room")
@@ -210,5 +214,17 @@ public class AssetRoomController {
     public CommonResult<List<Map<String,Object>>> orderTj(Date beginTime, Date endTime) {
         List<Map<String,Object>>assetRooms = assetRoomService.orderTj(beginTime,endTime);
         return CommonResult.success(assetRooms);
+    }
+
+    @ApiOperation("订单统计")
+    @RequestMapping(value = "/exportExcel", method = RequestMethod.GET)
+    public void exportExcel( AssetRoomQueryParam assetRoomQueryParam, HttpServletResponse response) {
+        try {
+            assetRoomService.downloadExcel(assetRoomQueryParam,response);
+        } catch (Exception e) {
+            e.printStackTrace();
+           // return CommonResult.failed("导出失败");
+        }
+
     }
 }
