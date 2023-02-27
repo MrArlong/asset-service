@@ -11,8 +11,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -230,6 +232,19 @@ public class AssetOrderController {
     public void exportExcel(AssetOrderQueryParam param,HttpServletResponse response) {
         assetOrderService.downloadExcel(param,response);
 
+    }
+
+    @ApiOperation("导入资产")
+    @RequestMapping(value = "/importExcel", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public CommonResult importExcel( MultipartFile file) {
+        try {
+            assetOrderService.importExcel(file);
+            return CommonResult.success("导入成功");
+        }catch(Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
     }
 
 }

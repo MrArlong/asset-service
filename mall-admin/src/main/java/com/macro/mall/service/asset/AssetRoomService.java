@@ -5,6 +5,7 @@ import com.macro.mall.model.AssetRoom;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -19,7 +20,7 @@ public interface AssetRoomService {
     /**
      * 创建商品
      */
-    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     int create(AssetRoomParam assetRoomParam);
 
     /**
@@ -35,9 +36,9 @@ public interface AssetRoomService {
 
     /**
      * 批量修改审核状态
-     * @param ids 产品id
+     * @param ids          产品id
      * @param verifyStatus 审核状态
-     * @param detail 审核详情
+     * @param detail       审核详情
      */
     @Transactional
     int updateVerifyStatus(List<Long> ids, Integer verifyStatus, String detail);
@@ -84,7 +85,8 @@ public interface AssetRoomService {
     Long getOrderNum();
 
     List<String> getLc(Long floorId);
-    List<AssetRoom> getFj(Long floorId,String floor);
+
+    List<AssetRoom> getFj(Long floorId, String floor);
 
     List<AssetRoom> findByFloorId(Long floorId);
 
@@ -92,5 +94,7 @@ public interface AssetRoomService {
 
     List<Map<String, Object>> orderTj(Date beginTime, Date endTime);
 
-    int downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response) ;
+    int downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response);
+
+    void importExcel(MultipartFile file) throws Exception;
 }

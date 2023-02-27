@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -80,11 +81,11 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
         assetRooms.stream().forEach(a -> {
             AssetFloor brand = assetFloorMapper.selectByPrimaryKey(a.getFloorId());
-            if(Objects.nonNull(brand)){
+            if(Objects.nonNull(brand)) {
                 a.setFloorName(brand.getName());
             }
             // 如果数据库状态是已出租，那就按照数据库的已出租来，如果数据库状态是未出租，就按照订单来
-            if(a.getIsOccupancy().equals("0")){
+            if(a.getIsOccupancy().equals("0")) {
                 List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
                 if(CollUtil.isEmpty(assetOrderRooms)) {
                     a.setIsOccupancy("0");
@@ -263,7 +264,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
         assetRooms.stream().forEach(a -> {
-                if(a.getIsOccupancy().equals("0")){
+            if(a.getIsOccupancy().equals("0")) {
                 List<AssetOrderRoom> assetOrderRooms = assetOrderService.orderRoomms(a.getId());
                 if(CollUtil.isEmpty(assetOrderRooms)) {
                     a.setIsOccupancy("0");
@@ -284,14 +285,14 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
 
-        Map<String,Object>map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("sum", assetRooms.size());
         // 下架
         long below = assetRooms.stream().filter(a -> a.getZszt().equals("0")).count();
-        map.put("below",below);
+        map.put("below", below);
         // 上架
         long up = assetRooms.stream().filter(a -> a.getZszt().equals("1")).count();
-        map.put("up",up);
+        map.put("up", up);
 
         List<Long> collect1 = assetRooms.stream().filter(a -> a.getIsOccupancy().equals("1")).map(AssetRoom::getId).collect(Collectors.toList());
         List<Long> collect = assetRooms.stream().map(AssetRoom::getId).collect(Collectors.toList());
@@ -299,7 +300,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
 
         List<Long> collect2 = assetOrderRooms1.stream().map(AssetOrderRoom::getRoomId).collect(Collectors.toList());
         Set<Long> longs = CollUtil.unionDistinct(collect1, collect2);
-        map.put("cz",longs.size());
+        map.put("cz", longs.size());
 
 
         // 今日新增
@@ -308,38 +309,38 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         DateTime dateTime = DateUtil.parseDate(DateUtil.today());
 
         assetOrderExampleCriteria.andCreatetimeGreaterThanOrEqualTo(dateTime);
-        assetOrderExampleCriteria.andCreatetimeLessThan(DateUtil.offsetDay(dateTime,1));
+        assetOrderExampleCriteria.andCreatetimeLessThan(DateUtil.offsetDay(dateTime, 1));
         List<AssetOrder> assetOrderRooms = assetOrderMapper.selectByExample(assetOrderExample);
         int size = assetOrderRooms.size();
-        map.put("jrxz",size);
+        map.put("jrxz", size);
 
         // 昨日新增
         AssetOrderExample a2 = new AssetOrderExample();
         AssetOrderExample.Criteria aa2 = a2.createCriteria();
-        aa2.andCreatetimeGreaterThanOrEqualTo(DateUtil.offsetDay(dateTime,-1));
+        aa2.andCreatetimeGreaterThanOrEqualTo(DateUtil.offsetDay(dateTime, -1));
         aa2.andCreatetimeLessThan(dateTime);
         List<AssetOrder> zrxzs = assetOrderMapper.selectByExample(a2);
-        map.put("zrxz",zrxzs.size());
+        map.put("zrxz", zrxzs.size());
 
         // 本月新增
         AssetOrderExample a3 = new AssetOrderExample();
         AssetOrderExample.Criteria aa3 = a3.createCriteria();
         String format = DateUtil.format(new DateTime(), "yyyy-MM");
-        String bengin=format+"-01";
-        String end=format+"-31";
+        String bengin = format + "-01";
+        String end = format + "-31";
         aa3.andCreatetimeGreaterThanOrEqualTo(DateUtil.parse(bengin));
         aa3.andCreatetimeLessThan(DateUtil.parse(end));
         List<AssetOrder> byxzs = assetOrderMapper.selectByExample(a3);
-        map.put("byxz",byxzs.size());
-        BigDecimal bydde=new BigDecimal(0.00);
-        for(AssetOrder a:byxzs) {
-            bydde=bydde.add(a.getZje());
+        map.put("byxz", byxzs.size());
+        BigDecimal bydde = new BigDecimal(0.00);
+        for(AssetOrder a : byxzs) {
+            bydde = bydde.add(a.getZje());
         }
-        map.put("bydde",bydde);
+        map.put("bydde", bydde);
 
         // 总数
         List<AssetOrder> zss = assetOrderMapper.selectByExample(new AssetOrderExample());
-        map.put("zs",zss.size());
+        map.put("zs", zss.size());
 
 
         // 本周新增
@@ -350,12 +351,12 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         aa4.andCreatetimeGreaterThanOrEqualTo(weekStart);
         aa4.andCreatetimeLessThan(weekEnd);
         List<AssetOrder> bzxz = assetOrderMapper.selectByExample(a4);
-        map.put("bzxz",bzxz.size());
-        BigDecimal bzdde=new BigDecimal(0.00);
-        for(AssetOrder a:bzxz) {
-            bzdde=bzdde.add(a.getZje());
+        map.put("bzxz", bzxz.size());
+        BigDecimal bzdde = new BigDecimal(0.00);
+        for(AssetOrder a : bzxz) {
+            bzdde = bzdde.add(a.getZje());
         }
-        map.put("bzdde",bzdde);
+        map.put("bzdde", bzdde);
         return map;
     }
 
@@ -365,102 +366,170 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         AssetOrderExample assetOrderExample = new AssetOrderExample();
         AssetOrderExample.Criteria assetOrderExampleCriteria = assetOrderExample.createCriteria();
         assetOrderExampleCriteria.andCreatetimeGreaterThanOrEqualTo(beginTime);
-        assetOrderExampleCriteria.andCreatetimeLessThan(DateUtil.offsetDay(endTime,1));
-        List<Map<String,Object>> assetOrderRooms = assetOrderMapper.selectOrderTj(assetOrderExample);
+        assetOrderExampleCriteria.andCreatetimeLessThan(DateUtil.offsetDay(endTime, 1));
+        List<Map<String, Object>> assetOrderRooms = assetOrderMapper.selectOrderTj(assetOrderExample);
         return assetOrderRooms;
     }
 
     @Override
-    public int downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response)  {
+    public int downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response) {
         List<Map<String, Object>> responseList = new ArrayList<>();
 
         AssetRoomExample assetRoomExample = new AssetRoomExample();
         AssetRoomExample.Criteria criteria = assetRoomExample.createCriteria();
-        if(assetRoomParam.getFloorId()!=null){
+        if(assetRoomParam.getFloorId() != null) {
             criteria.andFloorIdEqualTo(assetRoomParam.getFloorId());
         }
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
 
         assetRooms.forEach(item -> {
-                Map<String, Object> map = new LinkedHashMap<>();
-                AssetFloor assetFloor = assetFloorMapper.selectByPrimaryKey(item.getFloorId());
-                map.put("资产名称", assetFloor.getName());
-                map.put("资产id", item.getFloorId());
-                map.put("楼层号", item.getFloorNum());
-                map.put("房间号", item.getRoomNum());
-                map.put("面积", item.getAcreage());
-                map.put("装修", item.getDecorationType());
-                map.put("展示状态（0下架1上架）", item.getZszt());
-                responseList.add(map);
-            });
+            Map<String, Object> map = new LinkedHashMap<>();
+            AssetFloor assetFloor = assetFloorMapper.selectByPrimaryKey(item.getFloorId());
+            map.put("id", item.getId());
+            map.put("资产id", item.getFloorId());
+            map.put("资产名称", assetFloor.getName());
+            map.put("楼层", item.getFloorNum());
+            map.put("房间号", item.getRoomNum());
+            map.put("面积", item.getAcreage());
+            map.put("价格", item.getPrice());
+            map.put("装修", item.getDecorationType());
+            map.put("展示状态（0下架1上架）", item.getZszt());
+            map.put("是否已租（0未租1已租）", item.getIsOccupancy());
+            responseList.add(map);
+        });
 
         List<AssetFloor> assetFloors = assetFloorMapper.selectByExample(new AssetFloorExample());
         List<Map<String, Object>> sheet2 = new ArrayList<>();
-        assetFloors.forEach(item->{
+        assetFloors.forEach(item -> {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("资产id", item.getId());
             map.put("资产名称", item.getName());
             sheet2.add(map);
         });
         try {
-            FileUtil.downloadExcelSheels(responseList,sheet2,"资产列表", response);
+            FileUtil.downloadExcelSheels(responseList, sheet2, "资产列表", response);
         }catch(IOException e) {
             e.printStackTrace();
         }
         return 1;
     }
 
-
-    public ResponseEntity<Object> importExecl(MultipartFile file) throws Exception {
-
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void importExcel(MultipartFile file) throws Exception {
         //读取工作簿
         Workbook workBook = WorkbookFactory.create(file.getInputStream());
         //读取工作表
         Sheet sheet = workBook.getSheetAt(0);
         //总行数
         int rowNumber = sheet.getPhysicalNumberOfRows();
-        //总列数
+
+        //标题行
         Row titleRow = sheet.getRow(0);
+        //总列数
         int colNum = titleRow.getPhysicalNumberOfCells();
 
         //校验是否填写内容
-        if (rowNumber <= 1) {
-            return new ResponseEntity("文件无内容", HttpStatus.BAD_REQUEST);
+        if(rowNumber <= 1) {
+            throw new Exception("文件无内容");
         }
+
         //循环读取每一行数据并校验
-        for (int i = 1; i < rowNumber; i++) {
+        for(int i = 1; i < rowNumber; i++) {
             try {
                 //读取行
                 Row row = sheet.getRow(i);
-                //读取单元格
-                AssetRoom salary = new AssetRoom();
-                JSONObject resultJson = new JSONObject(true);
-
-                for (int m = 0; m < colNum; m++) {
-                    if(titleRow.getCell(m) != null) {
-                        titleRow.getCell(m).setCellType(CellType.STRING);
-                    }else {
-                        throw new Exception("第" + (i + 1) + "列表头不能为空");
+                //
+                AssetRoom assetRoom = new AssetRoom();
+                //校验
+                for(int m = 0; m < colNum; m++) {
+                    String bt = titleRow.getCell(m).getStringCellValue();
+                    if(titleRow.getCell(m) == null || "".equals(bt)) {
+                        throw new Exception("列表头不能为空");
                     }
-
-                    if(row.getCell(m) != null) {
-                        row.getCell(m).setCellType(CellType.STRING);
-                    }else {
-                        resultJson.put(titleRow.getCell(m).getStringCellValue(), row.getCell(m));
-                        continue;
+                    if("资产id".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("资产id不能有空数据");
+                        }
                     }
-                    if(!"{}".equals(resultJson.toJSONString())) {
-                        salary.setFloorName(resultJson.toJSONString());
-                        assetRoomMapper.insert(salary);
+                    if("楼层".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("楼层号不能有空数据");
+                        }
+                    }
+                    if("房间号".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("房间号不能有空数据");
+                        }
+                    }
+                    if("展示状态（1上架0下架）".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("展示状态不能有空数据");
+                        }
                     }
                 }
-            } catch (Exception e) {
-                throw new Exception("第" + (i + 1) + "行数据有错误," + e.getMessage());
+                for(int m = 0; m < colNum; m++) {
+                    String bt = titleRow.getCell(m).getStringCellValue();
+                    if(row.getCell(m) != null && row.getCell(m).getCellType() != CellType.BLANK) {
+                        DataFormatter dataFormatter = new DataFormatter();
+                        String value = dataFormatter.formatCellValue(row.getCell(m));
+                        if("id".equals(bt)) {
+                            assetRoom.setId(Long.valueOf(value));
+                        }
+                        if("资产id".equals(bt)) {
+                            assetRoom.setFloorId(Long.valueOf(value));
+                        }
+                        if("楼层".equals(bt)) {
+                            assetRoom.setFloorNum(value);
+                        }
+                        if("房间号".equals(bt)) {
+                            assetRoom.setRoomNum(value);
+                        }
+                        if("面积".equals(bt)) {
+                            assetRoom.setAcreage(value);
+                        }
+                        if("装修".equals(bt)) {
+                            assetRoom.setDecorationType(value);
+                        }
+                        if("价格".equals(bt)) {
+                            assetRoom.setPrice(value);
+                        }
+                        if("展示状态（0下架1上架）".equals(bt)) {
+                            assetRoom.setZszt(value);
+                        }
+                        if("是否已租（0未租1已租）".equals(bt)) {
+                            assetRoom.setIsOccupancy(value);
+                        }
+                    }
+                }
+                //保存
+                if(assetRoom.getId() != null) {
+                    assetRoomMapper.updateByPrimaryKeySelective(assetRoom);
+                }else {
+                    assetRoomMapper.insertSelective(assetRoom);
+                }
+            }catch(Exception e) {
+                e.printStackTrace();
+                if("资产id不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,资产id不能有空数据");
+                }else if("楼层不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,楼层不能有空数据");
+                }else if("房间号不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,房间号不能有空数据");
+                }else if("展示状态不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,展示状态不能有空数据");
+                }else if("是否完工不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,是否完工不能有空数据");
+                }else if("列表头不能为空".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,列表头不能为空");
+                }else if("文件无内容".equals(e.getMessage())) {
+                    throw new Exception("文件无内容");
+                }else {
+                    throw new Exception("第" + (i + 1) + "行数据有错误");
+                }
             }
         }
         workBook.close();
-        return null;
     }
-
 
 }

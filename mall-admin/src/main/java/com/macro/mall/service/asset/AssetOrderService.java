@@ -6,6 +6,7 @@ import com.macro.mall.model.AssetOrderRoom;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -99,4 +100,6 @@ public interface AssetOrderService {
     List<AssetOrderRoom> orderRoommsList(List<Long> roomId);
 
     int downloadExcel(AssetOrderQueryParam param, HttpServletResponse response) ;
+
+    void importExcel(MultipartFile file) throws Exception ;
 }

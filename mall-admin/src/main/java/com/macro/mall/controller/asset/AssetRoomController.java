@@ -13,9 +13,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -221,5 +223,17 @@ public class AssetRoomController {
     public void exportExcel( AssetRoomQueryParam assetRoomQueryParam, HttpServletResponse response) {
          assetRoomService.downloadExcel(assetRoomQueryParam,response);
 
+    }
+    @ApiOperation("导入资产")
+    @RequestMapping(value = "/importExcel", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public CommonResult importExcel( MultipartFile file) {
+        try {
+            assetRoomService.importExcel(file);
+            return CommonResult.success("导入成功");
+        }catch(Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
     }
 }
