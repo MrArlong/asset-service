@@ -216,15 +216,10 @@ public class AssetRoomController {
         return CommonResult.success(assetRooms);
     }
 
-    @ApiOperation("订单统计")
+    @ApiOperation("导出房间")
     @RequestMapping(value = "/exportExcel", method = RequestMethod.GET)
     public void exportExcel( AssetRoomQueryParam assetRoomQueryParam, HttpServletResponse response) {
-        try {
-            assetRoomService.downloadExcel(assetRoomQueryParam,response);
-        } catch (Exception e) {
-            e.printStackTrace();
-           // return CommonResult.failed("导出失败");
-        }
+         assetRoomService.downloadExcel(assetRoomQueryParam,response);
 
     }
 }

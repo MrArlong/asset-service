@@ -15,12 +15,14 @@
  */
 package com.macro.mall.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
 
+import cn.hutool.poi.excel.ExcelWriter;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.util.IOUtils;
@@ -249,7 +251,36 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
         ServletOutputStream out = response.getOutputStream();
         // 终止后删除临时文件
         file.deleteOnExit();
-        writer.flush(out, true);
+        writer.flush(out, false);
+        //此处记得关闭输出Servlet流
+        IoUtil.close(out);
+    }
+    /**
+     * 导出excel自定义表名
+     */
+    public static void downloadExcelSheels(List<Map<String, Object>> list,List<Map<String,Object>> sheet2,String sheetName, HttpServletResponse response) throws IOException {
+        String tempPath = SYS_TEM_DIR + IdUtil.fastSimpleUUID() + ".xlsx";
+        File file = new File(tempPath);
+        BigExcelWriter  writer = ExcelUtil.getBigWriter(file);
+        // 一次性写出内容，使用默认样式，强制输出标题
+        writer.write(list, true);
+        if(CollUtil.isNotEmpty(sheet2)){
+            writer.setSheet(sheetName);
+            writer.write(sheet2, true);
+        }
+        SXSSFSheet sheet = (SXSSFSheet) writer.getSheet();
+        //上面需要强转SXSSFSheet  不然没有trackAllColumnsForAutoSizing方法
+        sheet.trackAllColumnsForAutoSizing();
+        //列宽自适应
+        writer.autoSizeColumnAll();
+        //response为HttpServletResponse对象
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
+        //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        response.setHeader("Content-Disposition", "attachment;filename=file.xlsx");
+        ServletOutputStream out = response.getOutputStream();
+        // 终止后删除临时文件
+        file.deleteOnExit();
+        writer.flush(out, false);
         //此处记得关闭输出Servlet流
         IoUtil.close(out);
     }

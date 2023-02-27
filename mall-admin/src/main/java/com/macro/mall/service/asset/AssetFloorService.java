@@ -1,9 +1,12 @@
 package com.macro.mall.service.asset;
 
 import com.macro.mall.dto.AssetFloorParam;
+import com.macro.mall.dto.AssetRoomQueryParam;
 import com.macro.mall.model.AssetFloor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -66,4 +69,8 @@ public interface AssetFloorService {
 
     Map<String,Object> getHometpAndGgtp();
 
+
+    int downloadExcel(HttpServletResponse response) ;
+
+    void importExcel(MultipartFile file) throws Exception;
 }

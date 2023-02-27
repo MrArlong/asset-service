@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.*;
@@ -369,8 +370,8 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         return assetOrderRooms;
     }
 
-@Override
-    public void downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response) throws Exception {
+    @Override
+    public int downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response)  {
         List<Map<String, Object>> responseList = new ArrayList<>();
 
         AssetRoomExample assetRoomExample = new AssetRoomExample();
@@ -381,7 +382,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         List<AssetRoom> assetRooms = assetRoomMapper.selectByExample(assetRoomExample);
 
         assetRooms.forEach(item -> {
-                Map<String, Object> map = new HashMap<>();
+                Map<String, Object> map = new LinkedHashMap<>();
                 AssetFloor assetFloor = assetFloorMapper.selectByPrimaryKey(item.getFloorId());
                 map.put("资产名称", assetFloor.getName());
                 map.put("资产id", item.getFloorId());
@@ -393,7 +394,20 @@ public class AssetRoomServiceImpl implements AssetRoomService {
                 responseList.add(map);
             });
 
-        FileUtil.downloadExcel(responseList, response);
+        List<AssetFloor> assetFloors = assetFloorMapper.selectByExample(new AssetFloorExample());
+        List<Map<String, Object>> sheet2 = new ArrayList<>();
+        assetFloors.forEach(item->{
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("资产id", item.getId());
+            map.put("资产名称", item.getName());
+            sheet2.add(map);
+        });
+        try {
+            FileUtil.downloadExcelSheels(responseList,sheet2,"资产列表", response);
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
 

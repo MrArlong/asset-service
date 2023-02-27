@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -42,14 +43,7 @@ public interface AssetOrderService {
      */
     List<AssetOrder> list(AssetOrderQueryParam assetRoomQueryParam, Integer pageSize, Integer pageNum);
 
-    /**
-     * 批量修改审核状态
-     * @param ids 产品id
-     * @param verifyStatus 审核状态
-     * @param detail 审核详情
-     */
-    @Transactional
-    int updateVerifyStatus(List<Long> ids, Integer verifyStatus, String detail);
+
 
     /**
      * 批量修改商品上架状态
@@ -103,4 +97,6 @@ public interface AssetOrderService {
 
     List<AssetOrderRoom> orderRoomms(Long roomId);
     List<AssetOrderRoom> orderRoommsList(List<Long> roomId);
+
+    int downloadExcel(AssetOrderQueryParam param, HttpServletResponse response) ;
 }

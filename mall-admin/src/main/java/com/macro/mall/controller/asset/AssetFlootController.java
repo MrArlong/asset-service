@@ -3,22 +3,28 @@ package com.macro.mall.controller.asset;
 import com.macro.mall.common.api.CommonPage;
 import com.macro.mall.common.api.CommonResult;
 import com.macro.mall.dto.AssetFloorParam;
+import com.macro.mall.dto.AssetRoomQueryParam;
 import com.macro.mall.model.AssetFloor;
 import com.macro.mall.service.asset.AssetFloorService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
  * 资产管理Controller
  */
-@Controller
+@RestController
 @Api(tags = "AssetFlootController")
 @Tag(name = "AssetFlootController", description = "资产管理")
 @RequestMapping("/assetFloot")
@@ -142,4 +148,24 @@ public class AssetFlootController {
             return CommonResult.failed();
         }
     }
+    @ApiOperation("导出资产")
+    @RequestMapping(value = "/exportExcel", method = RequestMethod.GET)
+    public void exportExcel( HttpServletResponse response) {
+        assetFloorService.downloadExcel(response);
+
+    }
+
+    @ApiOperation("导入资产")
+    @RequestMapping(value = "/importExcel", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public CommonResult importExcel( MultipartFile file) {
+        try {
+            assetFloorService.importExcel(file);
+            return CommonResult.success("导入成功");
+        }catch(Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
 }

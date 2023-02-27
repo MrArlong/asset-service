@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -110,20 +111,6 @@ public class AssetOrderController {
     public CommonResult<List<AssetOrder>> getList(String keyword) {
         List<AssetOrder> list = assetOrderService.list(keyword);
         return CommonResult.success(list);
-    }
-
-    @ApiOperation("批量修改审核状态")
-    @RequestMapping(value = "/update/verifyStatus", method = RequestMethod.POST)
-    @ResponseBody
-    public CommonResult updateVerifyStatus(@RequestParam("ids") List<Long> ids,
-                                           @RequestParam("verifyStatus") Integer verifyStatus,
-                                           @RequestParam("detail") String detail) {
-        int count = assetOrderService.updateVerifyStatus(ids, verifyStatus, detail);
-        if (count > 0) {
-            return CommonResult.success(count);
-        } else {
-            return CommonResult.failed();
-        }
     }
 
     @ApiOperation("批量上下架商品")
@@ -238,4 +225,11 @@ public class AssetOrderController {
         List<AssetOrderRoomDto> assetRooms = assetOrderService.lqyj(assetRoomQueryParam, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(assetRooms));
     }
+    @ApiOperation("导出订单")
+    @RequestMapping(value = "/exportExcel", method = RequestMethod.GET)
+    public void exportExcel(AssetOrderQueryParam param,HttpServletResponse response) {
+        assetOrderService.downloadExcel(param,response);
+
+    }
+
 }

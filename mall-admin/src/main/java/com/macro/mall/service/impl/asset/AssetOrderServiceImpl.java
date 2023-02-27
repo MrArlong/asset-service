@@ -9,12 +9,10 @@ import com.macro.mall.dao.PmsProductDao;
 import com.macro.mall.dao.PmsProductVertifyRecordDao;
 import com.macro.mall.dao.PmsSkuStockDao;
 import com.macro.mall.dto.*;
-import com.macro.mall.mapper.AssetOrderMapper;
-import com.macro.mall.mapper.AssetOrderRoomMapper;
-import com.macro.mall.mapper.AssetRoomMapper;
-import com.macro.mall.mapper.PmsSkuStockMapper;
+import com.macro.mall.mapper.*;
 import com.macro.mall.model.*;
 import com.macro.mall.service.asset.AssetOrderService;
+import com.macro.mall.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -22,11 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +45,7 @@ public class AssetOrderServiceImpl implements AssetOrderService {
     @Autowired
     private PmsSkuStockMapper skuStockMapper;
     @Autowired
-    private PmsProductVertifyRecordDao productVertifyRecordDao;
+    private AssetFloorMapper assetFloorMapper;
 
     @Override
     public int create(AssetOrderParam assetOrderParam) {
@@ -193,27 +191,6 @@ public class AssetOrderServiceImpl implements AssetOrderService {
         return assetOrderMapper.selectByExample(assetRoomExample);
     }
 
-    @Override
-    public int updateVerifyStatus(List<Long> ids, Integer verifyStatus, String detail) {
-        AssetOrder assetRoom = new AssetOrder();
-       // assetRoom.setVerifyStatus(verifyStatus);
-        AssetOrderExample example = new AssetOrderExample();
-        example.createCriteria().andIdIn(ids);
-        List<PmsProductVertifyRecord> list = new ArrayList<>();
-        int count = assetOrderMapper.updateByExampleSelective(assetRoom, example);
-        //修改完审核状态后插入审核记录
-        for (Long id : ids) {
-            PmsProductVertifyRecord record = new PmsProductVertifyRecord();
-            record.setProductId(id);
-            record.setCreateTime(new Date());
-            record.setDetail(detail);
-            record.setStatus(verifyStatus);
-            record.setVertifyMan("test");
-            list.add(record);
-        }
-        productVertifyRecordDao.insertList(list);
-        return count;
-    }
 
     @Override
     public int updatePublishStatus(List<Long> ids, Integer publishStatus) {
@@ -379,5 +356,84 @@ public class AssetOrderServiceImpl implements AssetOrderService {
         roomCriteria.andEndTimeGreaterThan(new Date());
         List<AssetOrderRoom> assetOrderRooms = assetOrderRoomMapper.selectByExample(room);
         return assetOrderRooms;
+    }
+    @Override
+    public int downloadExcel(AssetOrderQueryParam param, HttpServletResponse response)  {
+        List<Map<String, Object>> responseList = new ArrayList<>();
+
+        AssetOrderExample assetOrderExample = new AssetOrderExample();
+        AssetOrderExample.Criteria criteria = assetOrderExample.createCriteria();
+        if(StrUtil.isNotBlank(param.getZlr())){
+            criteria.andZlrLike("%"+param.getZlr()+"%");
+        }
+        List<AssetOrder> assetRooms = assetOrderMapper.selectByExample(assetOrderExample);
+        assetRooms.forEach(item -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", item.getId());
+            map.put("订单编号", item.getOrderNum());
+            map.put("操作人", item.getCzr());
+            map.put("租赁人", item.getZlr());
+            map.put("租赁人联系电话", item.getZlrlxdh());
+            map.put("支付时间", DateUtil.formatDate(item.getZfsj()));
+            map.put("支付方式", item.getZffs());
+            map.put("总金额", item.getZje());
+            map.put("订单id", "");
+            map.put("资产id", "");
+            map.put("资产名称", "");
+            map.put("楼层", "");
+            map.put("房间id", "");
+            map.put("房间号", "");
+            map.put("租赁开始时间", "");
+            map.put("租赁结束时间", "");
+            map.put("租赁单价", "");
+            map.put("租赁总价", "");
+            responseList.add(map);
+            List<AssetOrderRoomDto> assetOrderRoomDtos = assetOrderRoomMapper.selectByOrderId(item.getId());
+            if(CollUtil.isNotEmpty(assetOrderRoomDtos)){
+                assetOrderRoomDtos.stream().forEach(a->{
+                    Map<String, Object> map1 = new LinkedHashMap<>();
+                    map1.put("订单id", a.getOrderId());
+                    map1.put("资产id", a.getFloorId());
+                    map1.put("资产名称", a.getFloorName());
+                    map1.put("楼层", a.getFloorNum());
+                    map1.put("房间id", a.getRoomId());
+                    map1.put("房间号", a.getRoomNum());
+                    map1.put("租赁开始时间", DateUtil.formatDate(a.getBeginTime()));
+                    map1.put("租赁结束时间", DateUtil.formatDate(a.getEndTime()));
+                    map1.put("租赁单价", a.getUnitprice());
+                    map1.put("租赁总价", a.getPrice());
+                    responseList.add(map1);
+                });
+            }
+        });
+        List<Map<String, Object>> sheet2 = new ArrayList<>();
+        List<AssetFloor> assetFloors = assetFloorMapper.selectByExample(new AssetFloorExample());
+        assetFloors.forEach(item->{
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("资产id", item.getId());
+            map.put("资产名称", item.getName());
+            map.put("房间id", "");
+            map.put("楼层", "");
+            map.put("房间号", "");
+            sheet2.add(map);
+            AssetRoomExample assetRoomExample = new AssetRoomExample();
+            AssetRoomExample.Criteria criteria1 = assetRoomExample.createCriteria();
+            criteria1.andFloorIdEqualTo(item.getId());
+            List<AssetRoom> rooms = assetRoomMapper.selectByExample(assetRoomExample);
+            rooms.stream().forEach(a->{
+                Map<String, Object> map1 = new LinkedHashMap<>();
+                map1.put("房间id", a.getId());
+                map1.put("楼层", a.getFloorNum());
+                map1.put("房间号", a.getRoomNum());
+                sheet2.add(map1);
+            });
+        });
+
+        try {
+            FileUtil.downloadExcelSheels(responseList,sheet2,"资产和房间", response);
+        }catch(IOException e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 }

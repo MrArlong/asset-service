@@ -92,5 +92,5 @@ public interface AssetRoomService {
 
     List<Map<String, Object>> orderTj(Date beginTime, Date endTime);
 
-    void downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response) throws Exception;
+    int downloadExcel(AssetRoomQueryParam assetRoomParam, HttpServletResponse response) ;
 }
