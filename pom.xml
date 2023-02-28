@@ -4,19 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.macro.mall</groupId>
-    <artifactId>mall</artifactId>
+    <groupId>com.macro.asset</groupId>
+    <artifactId>asset</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>mall-common</module>
-        <module>mall-mbg</module>
-        <module>mall-security</module>
-        <module>mall-demo</module>
-        <module>mall-admin</module>
-        <module>mall-search</module>
-        <module>mall-portal</module>
+        <module>asset-common</module>
+        <module>asset-mbg</module>
+        <module>asset-security</module>
+        <module>asset-admin</module>
     </modules>
 
     <parent>
@@ -50,9 +47,9 @@
         <logstash-logback.version>7.2</logstash-logback.version>
         <minio.version>8.4.5</minio.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <mall-common.version>1.0-SNAPSHOT</mall-common.version>
-        <mall-mbg.version>1.0-SNAPSHOT</mall-mbg.version>
-        <mall-security.version>1.0-SNAPSHOT</mall-security.version>
+        <asset-common.version>1.0-SNAPSHOT</asset-common.version>
+        <asset-mbg.version>1.0-SNAPSHOT</asset-mbg.version>
+        <asset-security.version>1.0-SNAPSHOT</asset-security.version>
     </properties>
 
     <dependencies>
@@ -104,21 +101,21 @@
         <dependencies>
             <!--mall通用模块-->
             <dependency>
-                <groupId>com.macro.mall</groupId>
-                <artifactId>mall-common</artifactId>
-                <version>${mall-common.version}</version>
+                <groupId>com.macro.asset</groupId>
+                <artifactId>asset-common</artifactId>
+                <version>${asset-common.version}</version>
             </dependency>
             <!--mall中MBG生成模块-->
             <dependency>
-                <groupId>com.macro.mall</groupId>
-                <artifactId>mall-mbg</artifactId>
-                <version>${mall-mbg.version}</version>
+                <groupId>com.macro.asset</groupId>
+                <artifactId>asset-mbg</artifactId>
+                <version>${asset-mbg.version}</version>
             </dependency>
             <!--mall安全模块-->
             <dependency>
-                <groupId>com.macro.mall</groupId>
-                <artifactId>mall-security</artifactId>
-                <version>${mall-security.version}</version>
+                <groupId>com.macro.asset</groupId>
+                <artifactId>asset-security</artifactId>
+                <version>${asset-security.version}</version>
             </dependency>
             <!--MyBatis分页插件starter-->
             <dependency>
