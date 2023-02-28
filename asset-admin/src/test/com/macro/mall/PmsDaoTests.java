@@ -2,8 +2,6 @@ package com.macro.mall;
 
 
 import cn.hutool.json.JSONUtil;
-import com.macro.mall.dto.PmsProductResult;
-import com.macro.mall.model.PmsMemberPrice;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
