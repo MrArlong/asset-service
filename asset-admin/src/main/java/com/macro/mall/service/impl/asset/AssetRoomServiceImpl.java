@@ -363,14 +363,14 @@ public class AssetRoomServiceImpl implements AssetRoomService {
             Map<String, Object> map = new LinkedHashMap<>();
             AssetFloor assetFloor = assetFloorMapper.selectByPrimaryKey(item.getFloorId());
             map.put("id", item.getId());
-            map.put("资产id", item.getFloorId());
+            map.put("资产id（必填）", item.getFloorId());
             map.put("资产名称", assetFloor.getName());
-            map.put("楼层", item.getFloorNum());
-            map.put("房间号", item.getRoomNum());
+            map.put("楼层（必填）", item.getFloorNum());
+            map.put("房间号（必填）", item.getRoomNum());
             map.put("面积", item.getAcreage());
             map.put("价格", item.getPrice());
             map.put("装修", item.getDecorationType());
-            map.put("展示状态（0下架1上架）", item.getZszt());
+            map.put("展示状态（0下架1上架）（必填）", item.getZszt());
             map.put("是否已租（0未租1已租）", item.getIsOccupancy());
             responseList.add(map);
         });
@@ -384,7 +384,9 @@ public class AssetRoomServiceImpl implements AssetRoomService {
             sheet2.add(map);
         });
         try {
-            FileUtil.downloadExcelSheels(responseList, sheet2, "资产列表", response);
+            String content1="注：若有新增房间先查看“资产列表”工作表，把对应的资产id复制到本表中。";
+            String content2="注：若有新增房间请对照资产名称，把本表中的”资产id“对应填写在要新增房间中的”资产id“字段中。";
+            FileUtil.downloadExcelSheels(responseList, sheet2, "资产列表",content1,content2, response);
         }catch(IOException e) {
             e.printStackTrace();
         }
@@ -402,21 +404,20 @@ public class AssetRoomServiceImpl implements AssetRoomService {
         int rowNumber = sheet.getPhysicalNumberOfRows();
 
         //标题行
-        Row titleRow = sheet.getRow(0);
+        Row titleRow = sheet.getRow(1);
         //总列数
         int colNum = titleRow.getPhysicalNumberOfCells();
 
         //校验是否填写内容
-        if(rowNumber <= 1) {
+        if(rowNumber <= 2) {
             throw new Exception("文件无内容");
         }
 
         //循环读取每一行数据并校验
-        for(int i = 1; i < rowNumber; i++) {
+        for(int i = 2; i < rowNumber; i++) {
             try {
                 //读取行
                 Row row = sheet.getRow(i);
-                //
                 AssetRoom assetRoom = new AssetRoom();
                 //校验
                 for(int m = 0; m < colNum; m++) {
@@ -424,22 +425,22 @@ public class AssetRoomServiceImpl implements AssetRoomService {
                     if(titleRow.getCell(m) == null || "".equals(bt)) {
                         throw new Exception("列表头不能为空");
                     }
-                    if("资产id".equals(bt)) {
+                    if("资产id（必填）".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("资产id不能有空数据");
                         }
                     }
-                    if("楼层".equals(bt)) {
+                    if("楼层（必填）".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("楼层号不能有空数据");
                         }
                     }
-                    if("房间号".equals(bt)) {
+                    if("房间号（必填）".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("房间号不能有空数据");
                         }
                     }
-                    if("展示状态（1上架0下架）".equals(bt)) {
+                    if("展示状态（1上架0下架）（必填）".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("展示状态不能有空数据");
                         }
@@ -453,13 +454,13 @@ public class AssetRoomServiceImpl implements AssetRoomService {
                         if("id".equals(bt)) {
                             assetRoom.setId(Long.valueOf(value));
                         }
-                        if("资产id".equals(bt)) {
+                        if("资产id（必填）".equals(bt)) {
                             assetRoom.setFloorId(Long.valueOf(value));
                         }
-                        if("楼层".equals(bt)) {
+                        if("楼层（必填）".equals(bt)) {
                             assetRoom.setFloorNum(value);
                         }
-                        if("房间号".equals(bt)) {
+                        if("房间号（必填）".equals(bt)) {
                             assetRoom.setRoomNum(value);
                         }
                         if("面积".equals(bt)) {
@@ -471,7 +472,7 @@ public class AssetRoomServiceImpl implements AssetRoomService {
                         if("价格".equals(bt)) {
                             assetRoom.setPrice(value);
                         }
-                        if("展示状态（0下架1上架）".equals(bt)) {
+                        if("展示状态（0下架1上架）（必填）".equals(bt)) {
                             assetRoom.setZszt(value);
                         }
                         if("是否已租（0未租1已租）".equals(bt)) {

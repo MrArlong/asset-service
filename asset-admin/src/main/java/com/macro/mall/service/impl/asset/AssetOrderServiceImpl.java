@@ -309,70 +309,57 @@ public class AssetOrderServiceImpl implements AssetOrderService {
         List<AssetOrder> assetRooms = assetOrderMapper.selectByExample(assetOrderExample);
         assetRooms.forEach(item -> {
             Map<String, Object> map = new LinkedHashMap<>();
-            map.put("id", item.getId());
-            map.put("订单编号", item.getOrderNum());
-            map.put("操作人", item.getCzr());
-            map.put("租赁人", item.getZlr());
-            map.put("租赁人联系电话", item.getZlrlxdh());
-            map.put("支付时间", DateUtil.formatDate(item.getZfsj()));
-            map.put("支付方式", item.getZffs());
-            map.put("总金额", item.getZje());
-            map.put("订单从表id", "");
-            map.put("订单id", "");
-            map.put("资产id", "");
-            map.put("资产名称", "");
-            map.put("楼层", "");
-            map.put("房间id", "");
-            map.put("房间号", "");
-            map.put("租赁开始时间", "");
-            map.put("租赁结束时间", "");
-            map.put("租赁单价", "");
-            map.put("租赁总价", "");
-            responseList.add(map);
             List<AssetOrderRoomDto> assetOrderRoomDtos = assetOrderRoomMapper.selectByOrderId(item.getId());
             if(CollUtil.isNotEmpty(assetOrderRoomDtos)) {
                 assetOrderRoomDtos.stream().forEach(a -> {
-                    Map<String, Object> map1 = new LinkedHashMap<>();
-                    map1.put("订单房间id", a.getId());
-                    map1.put("订单id", a.getOrderId());
-                    map1.put("资产id", a.getFloorId());
-                    map1.put("资产名称", a.getFloorName());
-                    map1.put("楼层", a.getFloorNum());
-                    map1.put("房间id", a.getRoomId());
-                    map1.put("房间号", a.getRoomNum());
-                    map1.put("租赁开始时间", DateUtil.formatDate(a.getBeginTime()));
-                    map1.put("租赁结束时间", DateUtil.formatDate(a.getEndTime()));
-                    map1.put("租赁单价", a.getUnitprice());
-                    map1.put("租赁总价", a.getPrice());
-                    responseList.add(map1);
+                    map.put("id", item.getId());
+                    map.put("订单编号（必填）", item.getOrderNum());
+                    map.put("操作人", item.getCzr());
+                    map.put("租赁人", item.getZlr());
+                    map.put("租赁人联系电话", item.getZlrlxdh());
+                    map.put("支付时间", DateUtil.formatDate(item.getZfsj()));
+                    map.put("支付方式", item.getZffs());
+                    map.put("总金额（必填）", item.getZje());
+
+
+                    map.put("订单从表id", a.getId());
+                    map.put("订单id", a.getOrderId());
+                    map.put("资产id（必填）", a.getFloorId());
+                    map.put("资产名称", a.getFloorName());
+                    map.put("楼层", a.getFloorNum());
+                    map.put("房间id（必填）", a.getRoomId());
+                    map.put("房间号", a.getRoomNum());
+                    map.put("租赁开始时间", DateUtil.formatDate(a.getBeginTime()));
+                    map.put("租赁结束时间", DateUtil.formatDate(a.getEndTime()));
+                    map.put("租赁单价", a.getUnitprice());
+                    map.put("租赁总价（必填）", a.getPrice());
+                    responseList.add(map);
                 });
             }
+
         });
         List<Map<String, Object>> sheet2 = new ArrayList<>();
         List<AssetFloor> assetFloors = assetFloorMapper.selectByExample(new AssetFloorExample());
         assetFloors.forEach(item -> {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("资产id", item.getId());
-            map.put("资产名称", item.getName());
-            map.put("房间id", "");
-            map.put("楼层", "");
-            map.put("房间号", "");
-            sheet2.add(map);
             AssetRoomExample assetRoomExample = new AssetRoomExample();
             AssetRoomExample.Criteria criteria1 = assetRoomExample.createCriteria();
             criteria1.andFloorIdEqualTo(item.getId());
             List<AssetRoom> rooms = assetRoomMapper.selectByExample(assetRoomExample);
             rooms.stream().forEach(a -> {
-                Map<String, Object> map1 = new LinkedHashMap<>();
-                map1.put("房间id", a.getId());
-                map1.put("楼层", a.getFloorNum());
-                map1.put("房间号", a.getRoomNum());
-                sheet2.add(map1);
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put("资产id", item.getId());
+                map.put("资产名称", item.getName());
+                map.put("房间id", a.getId());
+                map.put("楼层", a.getFloorNum());
+                map.put("房间号", a.getRoomNum());
+                sheet2.add(map);
             });
         });
 
         try {
-            FileUtil.downloadExcelSheels(responseList, sheet2, "资产和房间", response);
+            String content1="注：若有新增订单先查看“资产与房间”工作表，把对应的资产id与房间id复制到本表中，订单从表id与订单id可为空。更新数据时订单从表id与订单id不可为空。";
+            String content2="注：若有新增订单请对照资产名称、房间名称，把本表中的”资产id、房间id“对应填写在要新增订单中的”资产id、房间id“字段中，“id”、“订单从表id”、“订单id可为空”。";
+            FileUtil.downloadExcelSheels(responseList, sheet2, "资产和房间",content1,content2, response);
         }catch(IOException e) {
             e.printStackTrace();
         }
@@ -391,22 +378,53 @@ public class AssetOrderServiceImpl implements AssetOrderService {
         int rowNumber = sheet.getPhysicalNumberOfRows();
 
         //标题行
-        Row titleRow = sheet.getRow(0);
+        Row titleRow = sheet.getRow(1);
         //总列数
         int colNum = titleRow.getPhysicalNumberOfCells();
 
         //校验是否填写内容
-        if(rowNumber <= 1) {
+        if(rowNumber <= 2) {
             throw new Exception("文件无内容");
         }
         Long newId = 0L;
         //循环读取每一行数据并校验
-        for(int i = 1; i < rowNumber; i++) {
+        for(int i = 2; i < rowNumber; i++) {
             try {
                 //读取行
                 Row row = sheet.getRow(i);
                 //
                 AssetOrder assetOrder = new AssetOrder();
+                //校验
+                for(int m = 0; m < colNum; m++) {
+                    String bt = titleRow.getCell(m).getStringCellValue();
+                    if(titleRow.getCell(m) == null || "".equals(bt)) {
+                        throw new Exception("列表头不能为空");
+                    }
+                    if("订单编号（必填）".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("订单编号不能有空数据");
+                        }
+                    }if("总金额（必填）".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("总金额不能有空数据");
+                        }
+                    }
+                    if("资产id（必填）".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("资产id不能有空数据");
+                        }
+                    }
+                    if("房间id（必填）".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("房间id不能有空数据");
+                        }
+                    }
+                    if("租赁总价（必填）".equals(bt)) {
+                        if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
+                            throw new Exception("租赁总价不能有空数据");
+                        }
+                    }
+                }
 
                 DataFormatter dataFormatter = new DataFormatter();
                 //id
@@ -456,10 +474,16 @@ public class AssetOrderServiceImpl implements AssetOrderService {
                         newId = assetOrder.getId();
                         assetOrderMapper.updateByPrimaryKeySelective(assetOrder);
                     }else {
-                        if(StrUtil.isBlank(assetOrder.getOrderNum())) {
-                            assetOrder.setOrderNum(getOrderNum().toString());
+                        AssetOrderExample assetOrderExample = new AssetOrderExample();
+                        AssetOrderExample.Criteria criteria = assetOrderExample.createCriteria();
+                        criteria.andOrderNumEqualTo(assetOrder.getOrderNum());
+                        List<AssetOrder> assetOrders = assetOrderMapper.selectByExample(assetOrderExample);
+                        if(CollUtil.isNotEmpty(assetOrders)){
+                            assetOrder.setId(assetOrders.get(0).getId());
+                            assetOrderMapper.updateByPrimaryKeySelective(assetOrder);
+                        }else{
+                            assetOrderMapper.insertSelective(assetOrder);
                         }
-                        assetOrderMapper.insertSelective(assetOrder);
                         newId = assetOrder.getId();
                     }
                 }
@@ -536,6 +560,16 @@ public class AssetOrderServiceImpl implements AssetOrderService {
                     throw new Exception("第" + (i + 1) + "行数据有错误,日期格式错误");
                 }else if("文件无内容".equals(e.getMessage())) {
                     throw new Exception("文件无内容");
+                }else if("订单编号不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,订单编号不能有空数据");
+                }else if("总金额不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,总金额不能有空数据");
+                }else if("资产id不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,资产id不能有空数据");
+                }else if("房间id不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,房间id不能有空数据");
+                }else if("租赁总价不能有空数据".equals(e.getMessage())) {
+                    throw new Exception("第" + (i + 1) + "行数据有错误,租赁总价不能有空数据");
                 }else {
                     throw new Exception("第" + (i + 1) + "行数据有错误");
                 }

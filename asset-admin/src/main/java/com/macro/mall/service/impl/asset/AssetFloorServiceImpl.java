@@ -1,5 +1,6 @@
 package com.macro.mall.service.impl.asset;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -183,7 +184,11 @@ public class AssetFloorServiceImpl implements AssetFloorService {
                 ggtp = ggtp + a.getLbtp();
             }
         }
-
+        if(CollUtil.isNotEmpty(assetGgimgs)){
+            map.put("remark", assetGgimgs.get(0).getRemark());
+        }else{
+            map.put("remark", "");
+        }
         map.put("hometp", hometp);
         map.put("ggtp", ggtp);
         return map;
@@ -194,21 +199,19 @@ public class AssetFloorServiceImpl implements AssetFloorService {
         List<Map<String, Object>> responseList = new ArrayList<>();
 
         AssetFloorExample assetRoomExample = new AssetFloorExample();
-        AssetFloorExample.Criteria criteria = assetRoomExample.createCriteria();
-
         List<AssetFloor> assetRooms = assetFloorMapper.selectByExample(assetRoomExample);
 
         assetRooms.forEach(item -> {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id", item.getId());
-            map.put("资产名称", item.getName());
-            map.put("资产地址", item.getAddress());
+            map.put("资产名称(必填)", item.getName());
+            map.put("资产地址(必填)", item.getAddress());
             map.put("所属区域", item.getRegion());
             map.put("联系人", item.getLxr());
             map.put("联系电话", item.getLxdh());
-            map.put("使用状态（2出租，1建设中，0筹划中）", item.getSyzt());
-            map.put("展示状态（1上架0下架）", item.getZszt());
-            map.put("是否完工（1是0否）", item.getIsfinish());
+            map.put("使用状态（2出租，1建设中，0筹划中）(必填)", item.getSyzt());
+            map.put("展示状态（1上架0下架）(必填)", item.getZszt());
+            map.put("是否完工（1是0否）(必填)", item.getIsfinish());
             map.put("排序", item.getSort());
             map.put("经度", item.getLongitude());
             map.put("纬度", item.getLatitude());
@@ -256,27 +259,27 @@ public class AssetFloorServiceImpl implements AssetFloorService {
                     if(titleRow.getCell(m) == null || "".equals(bt)) {
                         throw new Exception("列表头不能为空");
                     }
-                    if("资产名称".equals(bt)) {
+                    if("资产名称(必填)".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("资产名称不能有空数据");
                         }
                     }
-                    if("资产地址".equals(bt)) {
+                    if("资产地址(必填)".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("资产地址不能有空数据");
                         }
                     }
-                    if("使用状态（2出租，1建设中，0筹划中）".equals(bt)) {
+                    if("使用状态（2出租，1建设中，0筹划中）(必填)".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("使用状态不能有空数据");
                         }
                     }
-                    if("展示状态（1上架0下架）".equals(bt)) {
+                    if("展示状态（1上架0下架）(必填)".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("展示状态不能有空数据");
                         }
                     }
-                    if("是否完工（1是0否）".equals(bt)) {
+                    if("是否完工（1是0否）(必填)".equals(bt)) {
                         if(row.getCell(m) == null || row.getCell(m).getCellType() == CellType.BLANK) {
                             throw new Exception("是否完工不能有空数据");
                         }
@@ -290,10 +293,10 @@ public class AssetFloorServiceImpl implements AssetFloorService {
                         if("id".equals(bt)) {
                             floor.setId(Long.valueOf(value));
                         }
-                        if("资产名称".equals(bt)) {
+                        if("资产名称(必填)".equals(bt)) {
                             floor.setName(value);
                         }
-                        if("资产地址".equals(bt)) {
+                        if("资产地址(必填)".equals(bt)) {
                             floor.setAddress(value);
                         }
                         if("所属区域".equals(bt)) {
@@ -305,13 +308,13 @@ public class AssetFloorServiceImpl implements AssetFloorService {
                         if("联系电话".equals(bt)) {
                             floor.setLxdh(value);
                         }
-                        if("使用状态（2出租，1建设中，0筹划中）".equals(bt)) {
+                        if("使用状态（2出租，1建设中，0筹划中）(必填)".equals(bt)) {
                             floor.setSyzt(value);
                         }
-                        if("展示状态（1上架0下架）".equals(bt)) {
+                        if("展示状态（1上架0下架）(必填)".equals(bt)) {
                             floor.setZszt(value);
                         }
-                        if("是否完工（1是0否）".equals(bt)) {
+                        if("是否完工（1是0否）(必填)".equals(bt)) {
                             floor.setIsfinish(value);
                         }
                         if("排序".equals(bt)) {
