@@ -1,3 +1,7 @@
+server:
+  port: 8000
+  servlet:
+    context-path: /asset-service
 spring:
   application:
     name: mall-admin
@@ -45,6 +49,7 @@ secure:
       - /actuator/**
       - /druid/**
       - /admin/login
+      - /asset-service/admin/login
       - /admin/register
       - /admin/info
       - /admin/logout
